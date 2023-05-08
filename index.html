@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ED Safari v0.0.1</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
+
+  </head>
+  <body>
+    <div id="app">
+        <!-- CURRENT LOCATION -->
+        <div class="container-fluid">
+            <div class="row separator align-items-center">
+                <div class="col"><hr class="separator"></div>
+                <div class="col-auto">Current Location</div>
+                <div class="col"><hr class="separator"></div>
+            </div>
+        </div>
+        <!-- table header -->
+        <div class="container-fluid">
+            <div class="row ml-1 mr-1 separator">
+                <div class="col-3 text-center">Name</div>
+                <div class="col">Type</div>
+                <div class="col-auto text-center">Distance</div>
+                <div class="col-1 text-center">Details</div>
+                <div class="col-2 text-center">Mapped Value</div>
+            </div>
+        </div>
+        <!-- system name -->
+        <div class="container-fluid">
+            <div class="row ml-1 mr-1">
+                <div id="currentLocation" :class="['col', 'system', {charted: currentLocation !== 'Unknown', highlighted: currentLocation === 'Unknown', 'text-center': currentLocation === 'Unknown'}]">
+                    {{ currentLocation }}
+                </div>
+            </div>
+        </div>
+        <!-- high-value scans -->
+        <div class="container-fluid">
+            <div class="row ml-1 mr-1 align-items-center"></div>
+        </div>
+        <!-- low-value scans -->
+        <div class="container-fluid">
+            <div class="row ml-1 mr-1 align-items-center"></div>
+        </div>
+        <!-- NAV ROUTE -->
+        <div class="container-fluid">
+            <div class="row separator align-items-center">
+                <div class="col"><hr class="separator"></div>
+                <div class="col-auto">Nav Route</div>
+                <div class="col"><hr class="separator"></div>
+            </div>
+        </div>
+        <!-- table header -->
+        <div class="container-fluid">
+            <div class="row ml-1 mr-1 separator">
+                <div class="col-1 text-right">LY</div>
+                <div class="col-3 text-center">Name</div>
+                <div class="col">Type</div>
+                <div class="col-2 text-center">Mapped Value</div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row separator align-items-center">
+                <div class="col"><hr class="seperator"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/renderer.js"></script>
+  </body>
+</html>

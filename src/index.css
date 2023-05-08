@@ -1,0 +1,144 @@
+@font-face {
+    font-family: 'Eurostile-Roman';
+    src: local('Eurostile-Roman'),
+        url('Eurostile-Roman.woff2') format('woff2'),
+        url('Eurostile-Roman.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+body {
+    background-color:black;
+    font: 20px Eurostile, sans-serif;
+    text-transform: uppercase;
+}
+
+.system {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    padding-left: 10px;
+    text-shadow: 0px 0px 3px;
+    margin-left: 1px;
+    margin-right: 1px;
+}
+.charted {
+    color: #9f9f9f;
+    background: #333333;
+}
+.uncharted {
+    color: #EAA529;
+    background: #370C03;
+}
+
+.hyperspace {
+    color: #0026FF;
+}
+.statusInfo {
+    color: #EAA529;
+    background: #370C03;
+}
+.inactive {
+    color: #000000;
+}
+
+.ring {
+    font-size: smaller;
+    padding: 0px;
+    margin: 0px;
+}
+
+.ring-separator {
+    font-size: smaller;
+    padding: 0px;
+    position: relative;
+    top: -3px;
+}
+
+div.highlighted b.active {
+    color: #000000;
+}
+div.highlighted b.inactive {
+    color: #F5A804;
+}
+div.uncharted b.active {
+    color: #EAA529;
+}
+div.uncharted b.inactive {
+    color: #370C03;
+}
+div.charted b.active {
+    color: #9f9f9f;
+}
+div.charted b.inactive {
+    color: #333333;
+}
+
+.highlighted {
+    color: #370C03;
+    background: #F5A804;
+}
+
+div b.active.landable {
+    color:#4CE0E1;
+}
+
+.currentSystemHighlight {
+    background: #17EFF9;
+}
+
+.current_location {
+    border-style: dotted;
+    border-color: #17EFF9;
+    border-width: 1px;
+}
+
+.latest-scan {
+    border-style: dotted;
+    border-color: #F5A804;
+    border-width: 1px;
+}
+
+.separator {
+    color: #F5A804;
+    border-color: #F5A804;
+    border-width: 1px 0px 1px 0px;
+    text-shadow: 0px 0px 3px;
+}
+
+.next-system {
+    color: #17EFF9;
+}
+
+.next-system hr {
+    border-color: #17EFF9;
+}
+
+.alert {
+    top: 1em;
+    bottom: 1em;
+}
+
+.gravity-indicator {
+    background-color: #000;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-left: 2px;
+}
+
+.gravity-good {
+    color: #0F0;
+}
+
+.gravity-alert {
+    color: #F00;
+}
+
+.gravity-warning {
+    color: #F60;
+}
+
+.gravity-hidden {
+    color: #00000000;
+    background-color: #00000000;
+}
