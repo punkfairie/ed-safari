@@ -36,15 +36,20 @@ createApp({
     setup() {
         const journal = new JournalInterface
 
+        // TODO: show warning to user
+        if (journal.journalDir === null) {
+            return
+        }
+
         journal.watchDirectory()
-        journal.watch()
+        journal.watchJournal()
 
         const currentLocation = ref('Unknown')
 
         journal.on('FSDJump', () => currentLocation.value = journal.currentLocation)
 
         return {
-            currentLocation
+            currentLocation,
         }
     }
 }).mount('#app')
