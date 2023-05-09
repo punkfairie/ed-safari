@@ -167,18 +167,21 @@ export class JournalInterface extends EventEmitter {
     // Parse and handle scan lines.
     parseScanLine(line, DSS = false) {
         const dupChecker = {'BodyName': line.BodyName, 'BodyID': line.bodyID}
+        let body = null
 
         // If it's a DSS scan, then we should have already added the body to the list. But we'll
         // check to make sure.
         if (DSS) {
             // Using findIndex() rather than find() so we can edit the body if found
-            let body = findIndex(this.location.bodies, dupChecker)
+            let bodyIndex = findIndex(this.location.bodies, dupChecker)
 
-            if (body > -1) { // Body was found in list, so simply toggle the DSS flag.
-                this.location.bodies[body].DSSDone = true
+            if (bodyIndex > -1) { // Body was found in list, so simply toggle the DSS flag.
+                body = this.location.bodies[bodyIndex]
+                body.DSSDone = true
             } else { // Body was missed on initial journal scan, so add it to the list.
                 line.DSSDone = true
-                this.location.bodies.push(Object.assign(new Body, line))
+                body = Object.assign(new Body, line)
+                this.location.bodies.push(body)
             }
             
         }  else { // Otherwise it's an FSS or auto scan, and needs to be added to the list.
@@ -186,14 +189,16 @@ export class JournalInterface extends EventEmitter {
             let r = find(this.location.bodies, dupChecker)
             
             if (r === undefined) {
-                this.location.bodies.push(Object.assign(new Body, line))
+                body = Object.assign(new Body, line)
+                this.location.bodies.push(body)
             }
         }
 
         log(`Scan detected. Body: ${line.BodyName}.`)
+        this.emit('BODY_SCANNED', body, DSS)
     }
 
-    /* -----------------------------------------------------------------------0000 parseLine ---- */
+    /* --------------------------------------------------------------------------- parseLine ---- */
 
     // Parse and handle journal lines.
     parseLine(raw) {
@@ -220,7 +225,6 @@ export class JournalInterface extends EventEmitter {
             // reset the DSS flag.
             case 'Scan': {
                 this.parseScanLine(line, DSSFlag)
-                this.emit('BODY_SCANNED')
                 DSSFlag = false
                 break
             }

@@ -26,7 +26,7 @@
  * ```
  */
 
-import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/css/bootstrap.css'
 import './assets/index.css'
 import './icons/flaticon.css'
 
@@ -81,4 +81,18 @@ journal.on('ENTERED_NEW_SYSTEM', () => {
     $('#lowValueScans').children().remove()
 
     $('#currentSystemName').text(journal.location.name)
+})
+
+/* ---------------------------------------------------------------------- body scan detected ---- */
+
+journal.on('BODY_SCANNED', (body, DSS) => {
+    // If this is a DSS scan, it's very likely that the body already exists in our list so we just
+    // need to remove the highlighting if applicable
+    if (DSS) {
+        const bodyRow = $(`#${body.BodyID}`)
+
+        if (bodyRow.length > 0) {
+            bodyRow.removeClass('highlighted uncharted').addClass('charted')
+        }
+    }
 })

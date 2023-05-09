@@ -44,20 +44,21 @@ const buildRings = (body) => {
 /* --------------------------------------------------------------------------- createBodyRow ---- */
 
 export const createBodyRow = (body) => {
-    const row = $('<div>').addClass('row ml-1 mr-1')
+    const chartedStyle = body.WasDiscovered ? 'charted' : 'uncharted'
+    const row = $('<div>').addClass('row ms-1 me-1')
     row.attr('id', body.bodyID)
 
     // spacer
     row.appendChild($('<div>').addClass('col-1 system'))
 
     // name
-    const name = $('<div>').addClass('col-2 system charted text-left')
+    const name = $('<div>').addClass(`col-2 text-left system ${chartedStyle}`)
     name.appendChild($('<i>')).addClass(`flaticon-${body.nameIcon()}`)
     name.appendChild($('<span>')).text(body.simpleName())
     row.appendChild(name)
 
     // type icon
-    const type = $('<div>').addClass('col pr-0 mr-0 system charted')
+    const type = $('<div>').addClass(`col pe-0 me-0 system ${chartedStyle}`)
     type.appendChild($('<i>').addClass(`flaticon-${body.typeIcon()}`))
     // rings
     if (body.Rings !== undefined) {
@@ -69,11 +70,12 @@ export const createBodyRow = (body) => {
     row.appendChild(type)
 
     // distance
-    const distance = $('<div>').addClass('col-auto pl-2 ml-0 system charted').text(body.distance())
+    const distance = $('<div>').addClass(`col-auto ps-2 ms-0 system ${chartedStyle}`)
+    distance.text(body.distance())
     row.appendChild(distance)
 
     // info
-    const info = $('<div>').addClass('col-1 system charted')
+    const info = $('<div>').addClass(`col-1 system ${chartedStyle}`)
     // terraformable
     const terraform = $('<i>').addClass('flaticon-cooling-tower opacity-0')
     if (body.isPlanet && body.TerraformState) {
@@ -89,7 +91,7 @@ export const createBodyRow = (body) => {
     row.appendChild(info)
 
     // mapped value
-    const value = $('<div>').addClass('col-2 system charted text-right')
+    const value = $('<div>').addClass(`col-2 text-right system ${chartedStyle}`)
     row.appendChild(value)
 
     return row
