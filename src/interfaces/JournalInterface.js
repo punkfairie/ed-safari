@@ -191,7 +191,6 @@ export class JournalInterface extends EventEmitter {
         }
 
         log(`Scan detected. Body: ${line.BodyName}.`)
-        log(this.location.bodies)
     }
 
     /* -----------------------------------------------------------------------0000 parseLine ---- */

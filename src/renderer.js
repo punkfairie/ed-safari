@@ -26,11 +26,11 @@
  * ```
  */
 
+import 'bootstrap/dist/css/bootstrap.min.css'
 import './assets/index.css'
 import './icons/flaticon.css'
 
 const { app } = require('electron')
-import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import { JournalInterface } from './interfaces/JournalInterface'
 import { createBodyRow } from './ui'
 
