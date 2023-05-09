@@ -27,14 +27,23 @@
  */
 
 import './index.css'
+import './icons/flaticon.css'
 
+const { app } = require('electron')
 import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-
 import { JournalInterface } from './interfaces/JournalInterface'
+
+// Grab app.isPackaged from main process
+let isPackaged = false
+window.process.argv.forEach((item) => {
+    if (item.includes('EDS-ENV')) {
+        isPackaged = (item.split('=').pop() === 'true')
+    }
+})
 
 createApp({
     setup() {
-        const journal = new JournalInterface
+        const journal = new JournalInterface(isPackaged)
 
         // TODO: show warning to user
         if (journal.journalDir === null) {
@@ -45,11 +54,15 @@ createApp({
         journal.watchJournal()
 
         const currentLocation = ref('Unknown')
+        const currentSystemBodies = ref([])
 
         journal.on('FSDJump', () => currentLocation.value = journal.currentLocation)
+        journal.on('SCANNED_BODIES_FOUND', () => currentSystemBodies.value = journal.currentLocation.bodies)
+
 
         return {
             currentLocation,
+            currentSystemBodies,
         }
     }
 }).mount('#app')

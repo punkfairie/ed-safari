@@ -15,6 +15,7 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
+      additionalArguments: [`EDS-ENV=${app.isPackaged}`],
     },
   });
 
