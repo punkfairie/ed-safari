@@ -205,6 +205,7 @@ export class JournalInterface extends EventEmitter {
             // CMDR jumped to new system, so update current location.
             case 'FSDJump': {
                 this.location = new System(line.StarSystem)
+                log(`FSD Jump detected, current location updated to ${this.location.name}.`)
                 this.emit('ENTERED_NEW_SYSTEM')
                 break
             }

@@ -3,6 +3,7 @@
 const buildRings = (body) => {
     const rings = $('<span>')
     const seperator = $('<span>').text(' ) ')
+    rings.appendChild(seperator)
 
     body.Rings.forEach((ring) => {
         const ringClass = ring.RingClass.replace('eRingClass_', '')

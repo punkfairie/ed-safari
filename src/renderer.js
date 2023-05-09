@@ -53,6 +53,8 @@ if (journal.journalDir === null) {
 journal.watchDirectory()
 journal.watchJournal()
 
+/* --------------------------------------------------------------------------- init complete ---- */
+
 journal.once('INIT_COMPLETE', () => {
     if (journal.location !== null) {
         $('#currentSystem')
@@ -70,4 +72,13 @@ journal.once('INIT_COMPLETE', () => {
             $('#lowValueScans').appendChild(row)
         })
     }
+})
+
+/* ---------------------------------------------------------------------- entered new system ---- */
+
+journal.on('ENTERED_NEW_SYSTEM', () => {
+    $('#highValueScans').children().remove()
+    $('#lowValueScans').children().remove()
+
+    $('#currentSystemName').text(journal.location.name)
 })
