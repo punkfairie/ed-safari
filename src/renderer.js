@@ -69,6 +69,7 @@ journal.once('INIT_COMPLETE', () => {
     if (journal.location.bodies.length > 0) {
         journal.location.bodies.forEach((body) => {
             const row = createBodyRow(body)
+            // TODO APPRAISAL DATA
             $('#lowValueScans').appendChild(row)
         })
     }
@@ -91,8 +92,17 @@ journal.on('BODY_SCANNED', (body, DSS) => {
     if (DSS) {
         const bodyRow = $(`#${body.BodyID}`)
 
-        if (bodyRow.length > 0) {
+        if (bodyRow.length > 0) { // check just in case body was missed in earlier scans
             bodyRow.removeClass('highlighted uncharted').addClass('charted')
+        } else {
+            const row = createBodyRow(body)
+            // TODO APPRAISAL DATA
+            $('#lowValueScans').appendChild(row)
         }
+
+    } else { // else it's an FSS/auto scan and won't be in the list yet
+        const row = createBodyRow(body)
+        // TODO APPRAISAL DATA
+        $('#lowValueScans').appendChild(row)
     }
 })

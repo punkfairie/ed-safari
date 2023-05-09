@@ -44,7 +44,7 @@ const buildRings = (body) => {
 /* --------------------------------------------------------------------------- createBodyRow ---- */
 
 export const createBodyRow = (body) => {
-    const chartedStyle = body.WasDiscovered ? 'charted' : 'uncharted'
+    const chartedStyle = body.WasDiscovered && !body.DSSDone ? 'charted' : 'uncharted'
     const row = $('<div>').addClass('row ms-1 me-1')
     row.attr('id', body.bodyID)
 
