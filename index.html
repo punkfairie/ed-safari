@@ -54,31 +54,61 @@
 
         <!-- low-value scans -->
         <div class="container-fluid">
-            <div v-for="body in currentSystemBodies" :key="body.BodyID" class="row ml-1 mr-1">
+            <div v-for="body in currentLocationBodies" :key="body.BodyID" class="row ml-1 mr-1">
                 <div class="col-1 system"><!-- indent --></div>
 
                 <div class="col-2 system charted text-left">
                     <i :class="{
-                        'flaticon-jupiter-3': body.PlanetClass,
-                        'flaticon-star': body.StarType,
-                        'flaticon-asteroid-4': body.BodyName.includes('Belt')
+                        'flaticon-jupiter-3': body.isPlanet(),
+                        'flaticon-star': body.isStar(),
+                        'flaticon-asteroid-4': body.isAsteroid()
                     }"></i>
-                    {{ body.BodyName.replace(body.StarSystem, '') }}
+                    {{ body.simpleName() }}
                 </div>
 
                 <div class="col pr-0 mr-0 system charted">
                     <i :class="{
-                        'flaticon-star': body.StarType,
-                        'flaticon-asteroid-4': body.BodyName.includes('Belt')
+                        'flaticon-star': body.isStar(),
+                        'flaticon-asteroid-4': body.isAsteroid(),
+                        'flaticon-ingot': body.PlanetClass?.toLowerCase().includes('metal'),
+                        'flaticon-snowflake': body.PlanetClass?.toLowerCase().includes('icy'),
+                        'flaticon-earth': body.PlanetClass?.toLowerCase().includes('earth'),
+                        'flaticon-jupiter-1': body.PlanetClass?.toLowerCase().includes('gas giant'),
+                        'flaticon-asteroid-3': body.PlanetClass?.toLowerCase().includes('rock'),
+                        'flaticon-water-drops': body.PlanetClass?.toLowerCase().includes('water') || body.PlanetClass?.toLowerCase().includes('ammonia'),
                     }"></i>
+
+                    <!-- rings -->
+                    <template v-if="body.Rings">
+                        )
+                        <template v-for="(ring, index) in body.Rings" :key="index">
+                            <i :class="{
+                                'flaticon-gold-bars': ring.RingClass === 'eRingClass_MetalRich',
+                                'flaticon-ingot': ring.RingClass === 'eRingClass_Metalic' || ring.RingClass === 'eRingClass_Metallic',
+                                'flaticon-snowflake': ring.RingClass === 'eRingClass_Icy',
+                                'flaticon-asteroid-3': ring.RingClass === 'eRingClass_Rocky',
+                            }"></i> )
+                        </template>
+                    </template>
+
                     {{ body.PlanetClass || body.StarType || '' }}
                 </div>
 
                 <div class="col-auto pl-2 ml-0 system charted">
-                    {{ Intl.NumberFormat().format(Math.round(body.DistanceFromArrivalLS)) }}
+                    {{ body.distance() }}
                 </div>
 
-                <div class="col-auto system charted"><!-- icons --></div>
+                <div class="col-1 system charted">
+                    <i :class="{
+                        'flaticon-cooling-tower': true,
+                        'opacity-0': !(body.isPlanet() && body.TerraformState),
+                    }"></i>
+
+                    <i :class="{
+                        'flaticon-flag-outline-on-a-pole-with-stars-around': true,
+                        'opacity-0': !(body.isPlanet() && !body.WasMapped),
+                    }"></i>
+                </div>
 
                 <div class="col-2 system charted text-right"><!-- mapped value --></div>
             </div>

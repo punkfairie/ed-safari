@@ -54,15 +54,15 @@ createApp({
         journal.watchJournal()
 
         const currentLocation = ref('Unknown')
-        const currentSystemBodies = ref([])
+        const currentLocationBodies = ref([])
 
         journal.on('FSDJump', () => currentLocation.value = journal.currentLocation)
-        journal.on('SCANNED_BODIES_FOUND', () => currentSystemBodies.value = journal.currentLocation.bodies)
+        journal.on('SCANNED_BODIES_FOUND', () => currentLocationBodies.value = journal.currentLocation.bodies)
 
 
         return {
             currentLocation,
-            currentSystemBodies,
+            currentLocationBodies,
         }
     }
 }).mount('#app')
