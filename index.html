@@ -1,145 +1,84 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>ED Safari v0.0.1</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
-
-  </head>
-  <body>
+    <script src="src/assets/ldom.dev.js"></script>
+</head>
+<body>
     <div id="app">
-        <!-- CURRENT LOCATION -->
-        <div class="container-fluid">
-            <div class="row separator align-items-center">
-                <div class="col"><hr class="separator"></div>
-                <div class="col-auto">Current Location</div>
-                <div class="col"><hr class="separator"></div>
-            </div>
-        </div>
-
-        <!-- table header -->
-        <div class="container-fluid">
-            <div class="row ml-1 mr-1 separator">
-                <div class="col-3 text-center">Name</div>
-                <div class="col">Type</div>
-                <div class="col-auto text-center">Distance</div>
-                <div class="col-1 text-center">Details</div>
-                <div class="col-2 text-center">Mapped Value</div>
-            </div>
-        </div>
-
-        <!-- system name -->
-        <div class="container-fluid">
-            <div class="row ml-1 mr-1">
-                <div id="currentLocation" :class="[
-                    'col',
-                    'system',
-                    {
-                        charted: currentLocation !== 'Unknown',
-                        highlighted: currentLocation === 'Unknown',
-                        'text-center': currentLocation === 'Unknown'
-                    }
-                ]">
-                    <i class="flaticon-solar-system"></i>
-                    {{ currentLocation.name }}
+        <div :key="reload">
+            <!-- CURRENT LOCATION -->
+            <div class="container-fluid">
+                <div class="row separator align-items-center">
+                    <div class="col"><hr class="separator"></div>
+                    <div class="col-auto">Current Location</div>
+                    <div class="col"><hr class="separator"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- high-value scans -->
-        <div class="container-fluid">
-            <div class="row ml-1 mr-1 align-items-center"></div>
-        </div>
-
-        <!-- low-value scans -->
-        <div class="container-fluid">
-            <div v-for="body in currentLocationBodies" :key="body.BodyID" class="row ml-1 mr-1">
-                <div class="col-1 system"><!-- indent --></div>
-
-                <div class="col-2 system charted text-left">
-                    <i :class="{
-                        'flaticon-jupiter-3': body.isPlanet(),
-                        'flaticon-star': body.isStar(),
-                        'flaticon-asteroid-4': body.isAsteroid()
-                    }"></i>
-                    {{ body.simpleName() }}
+            <!-- table header -->
+            <div class="container-fluid">
+                <div class="row ml-1 mr-1 separator">
+                    <div class="col-3 text-center">Name</div>
+                    <div class="col">Type</div>
+                    <div class="col-auto text-center">Distance</div>
+                    <div class="col-1 text-center">Details</div>
+                    <div class="col-2 text-center">Mapped Value</div>
                 </div>
-
-                <div class="col pr-0 mr-0 system charted">
-                    <i :class="{
-                        'flaticon-star': body.isStar(),
-                        'flaticon-asteroid-4': body.isAsteroid(),
-                        'flaticon-ingot': body.PlanetClass?.toLowerCase().includes('metal'),
-                        'flaticon-snowflake': body.PlanetClass?.toLowerCase().includes('icy'),
-                        'flaticon-earth': body.PlanetClass?.toLowerCase().includes('earth'),
-                        'flaticon-jupiter-1': body.PlanetClass?.toLowerCase().includes('gas giant'),
-                        'flaticon-asteroid-3': body.PlanetClass?.toLowerCase().includes('rock'),
-                        'flaticon-water-drops': body.PlanetClass?.toLowerCase().includes('water') || body.PlanetClass?.toLowerCase().includes('ammonia'),
-                    }"></i>
-
-                    <!-- rings -->
-                    <template v-if="body.Rings">
-                        )
-                        <template v-for="(ring, index) in body.Rings" :key="index">
-                            <i :class="{
-                                'flaticon-gold-bars': ring.RingClass === 'eRingClass_MetalRich',
-                                'flaticon-ingot': ring.RingClass === 'eRingClass_Metalic' || ring.RingClass === 'eRingClass_Metallic',
-                                'flaticon-snowflake': ring.RingClass === 'eRingClass_Icy',
-                                'flaticon-asteroid-3': ring.RingClass === 'eRingClass_Rocky',
-                            }"></i> )
-                        </template>
-                    </template>
-
-                    {{ body.PlanetClass || body.StarType || '' }}
-                </div>
-
-                <div class="col-auto pl-2 ml-0 system charted">
-                    {{ body.distance() }}
-                </div>
-
-                <div class="col-1 system charted">
-                    <i :class="{
-                        'flaticon-cooling-tower': true,
-                        'opacity-0': !(body.isPlanet() && body.TerraformState),
-                    }"></i>
-
-                    <i :class="{
-                        'flaticon-flag-outline-on-a-pole-with-stars-around': true,
-                        'opacity-0': !(body.isPlanet() && !body.WasMapped),
-                    }"></i>
-                </div>
-
-                <div class="col-2 system charted text-right"><!-- mapped value --></div>
             </div>
-        </div>
 
-        <!-- NAV ROUTE -->
-        <div class="container-fluid">
-            <div class="row separator align-items-center">
-                <div class="col"><hr class="separator"></div>
-                <div class="col-auto">Nav Route</div>
-                <div class="col"><hr class="separator"></div>
+            <!-- system name -->
+            <div class="container-fluid">
+                <div class="row ml-1 mr-1">
+                    <div id="currentSystem" class="col highlighted text-center">
+                        <i id="currentSystemIcon" class="flaticon-solar-system hidden"></i>
+                        <span id="currentSystemName">Unknown</span>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <!-- table header -->
-        <div class="container-fluid">
-            <div class="row ml-1 mr-1 separator">
-                <div class="col-1 text-right">LY</div>
-                <div class="col-3 text-center">Name</div>
-                <div class="col">Type</div>
-                <div class="col-2 text-center">Mapped Value</div>
+            <!-- high-value scans -->
+            <div class="container-fluid">
+                <div class="row ml-1 mr-1 align-items-center">
+                    <div class="col system charted">
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="container-fluid">
-            <div class="row separator align-items-center">
-                <div class="col"><hr class="seperator"></div>
+            <!-- low-value scans -->
+            <div class="container-fluid" id="lowValueScans">
+            </div>
+
+            <!-- NAV ROUTE -->
+            <div class="container-fluid">
+                <div class="row separator align-items-center">
+                    <div class="col"><hr class="separator"></div>
+                    <div class="col-auto">Nav Route</div>
+                    <div class="col"><hr class="separator"></div>
+                </div>
+            </div>
+
+            <!-- table header -->
+            <div class="container-fluid">
+                <div class="row ml-1 mr-1 separator">
+                    <div class="col-1 text-right">LY</div>
+                    <div class="col-3 text-center">Name</div>
+                    <div class="col">Type</div>
+                    <div class="col-2 text-center">Mapped Value</div>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row separator align-items-center">
+                    <div class="col"><hr class="seperator"></div>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module" src="/src/renderer.js"></script>
-  </body>
+</body>
 </html>

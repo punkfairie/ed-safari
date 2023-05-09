@@ -26,12 +26,13 @@
  * ```
  */
 
-import './index.css'
+import './assets/index.css'
 import './icons/flaticon.css'
 
 const { app } = require('electron')
 import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 import { JournalInterface } from './interfaces/JournalInterface'
+import { createBodyRow } from './ui'
 
 // Grab app.isPackaged from main process
 let isPackaged = false
@@ -41,28 +42,32 @@ window.process.argv.forEach((item) => {
     }
 })
 
-createApp({
-    setup() {
-        const journal = new JournalInterface(isPackaged)
+/* ------------------------------------------------------------------------------- app setup ---- */
 
-        // TODO: show warning to user
-        if (journal.journalDir === null) {
-            return
-        }
+const journal = new JournalInterface(isPackaged)
 
-        journal.watchDirectory()
-        journal.watchJournal()
+if (journal.journalDir === null) {
+    // handle error
+}
 
-        const currentLocation = ref('Unknown')
-        const currentLocationBodies = ref([])
+journal.watchDirectory()
+journal.watchJournal()
 
-        journal.on('FSDJump', () => currentLocation.value = journal.currentLocation)
-        journal.on('SCANNED_BODIES_FOUND', () => currentLocationBodies.value = journal.currentLocation.bodies)
+journal.once('INIT_COMPLETE', () => {
+    if (journal.location !== null) {
+        $('#currentSystem')
+            .addClass('charted')
+            .removeClass('highlighted text-center')
 
+        $('#currentSystemName').text(journal.location.name)
 
-        return {
-            currentLocation,
-            currentLocationBodies,
-        }
+        $('#currentSystemIcon').removeClass('hidden')
     }
-}).mount('#app')
+
+    if (journal.location.bodies.length > 0) {
+        journal.location.bodies.forEach((body) => {
+            const row = createBodyRow(body)
+            $('#lowValueScans').appendChild(row)
+        })
+    }
+})

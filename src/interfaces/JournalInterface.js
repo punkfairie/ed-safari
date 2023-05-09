@@ -1,5 +1,5 @@
-import { Body } from './Body'
-import { System } from './System'
+import { Body } from '../models/Body'
+import { System } from '../models/System'
 
 const EventEmitter = require('events')
 const fs = require('fs')
@@ -11,6 +11,7 @@ const lineReader = require('reverse-line-reader')
 const chokidar = require('chokidar')
 const Tail = require('tail').Tail
 const find = require('lodash/find')
+const findIndex = require('lodash/findIndex')
 
 // Set log() to console.log() so whenever I get around to setting up a log file, I don't have to
 // search and replace all the console.log()'s.
@@ -36,20 +37,13 @@ export class JournalInterface extends EventEmitter {
         this.currentJournal = this.getLatestJournal()
 
         // LineReader seems to be async, so start async processes here.
-        this.currentLocation = null
+        this.location = null
 
         log('JournalInterface initialized. Attempting to find current location.')
         this.getCurrentLocation()
-        .then(() => {
-            log('Attempting to find scanned bodies in current system.')
-            this.getScannedBodies()
-            .then(() => {
-                log('Scanned bodies found.')
-                this.emit('SCANNED_BODIES_FOUND')
-            })
-        })
-
     }
+
+    /* -------------------------------------------------------------------- getLatestJournal ---- */
 
     // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
     getLatestJournal() {
@@ -63,31 +57,38 @@ export class JournalInterface extends EventEmitter {
         log(`New journal file found, now watching ${path.basename(this.currentJournal)}.`)
     }
 
+    /* ------------------------------------------------------------------ getCurrentLocation ---- */
+
     // Get current location on setup, so if app is restarted, user can pick up where they left off
     // Rather than waiting til they jump to the next system to use the program again.
-    async getCurrentLocation() {
-        return lineReader.eachLine(this.currentJournal, (raw, last) => {            
+    getCurrentLocation() {
+        lineReader.eachLine(this.currentJournal, (raw, last) => {            
             if (raw) { // skip blank line at end of file
                 const line = JSON.parse(raw)
 
                 if (line.event === 'FSDJump') {
-                    this.currentLocation = new System(line.StarSystem)
-                    log(`Current location set to ${this.currentLocation.name}.`)
-                    this.emit('FSDJump')
+                    this.location = new System(line.StarSystem)
+                    log(`Current location set to ${this.location.name}.`)
+                    this.emit('ENTERED_NEW_SYSTEM')
                     return false
                 } else if (last) {
                     log('Warning: unable to find last hyperspace jump. Current location unknown.')
                     return false
                 }
             }
+        }).then(() => {
+            log('Attempting to find scanned bodies in current system.')
+            this.getScannedBodies()
         })
     }
 
+    /* -------------------------------------------------------------------- getScannedBodies ---- */
+
     // Look for all scanned bodies before last FSDJump, for same reasons as getCurrentLocation().
-    async getScannedBodies() {
+    getScannedBodies() {
         let detailedScanLine = null
 
-        return lineReader.eachLine(this.currentJournal, (raw, last) => {
+        lineReader.eachLine(this.currentJournal, (raw, last) => {
             
             if (raw) { // Skip blank line at end of file.
                 const line = JSON.parse(raw)
@@ -97,15 +98,14 @@ export class JournalInterface extends EventEmitter {
                     if (line.event === 'SAAScanComplete') {
                         // This was a DSS, so set the DSS flag to true and add to list.
                         detailedScanLine.DSSDone = true
-                        this.currentLocation.bodies.push(Object.assign(new Body, detailedScanLine))
+                        this.location.bodies.push(Object.assign(new Body, detailedScanLine))
                     } else {
                         // Else, check that the body hasn't already been added (by a DSS scan line).
-                        let r = find(this.currentLocation.bodies, ['BodyID', detailedScanLine.BodyID])
+                        let r = find(this.location.bodies, {'BodyName': detailedScanLine.BodyName, 'BodyID': detailedScanLine.BodyID})
 
                         if (r === undefined) {
-                            // Set DSS flag if body was not already logged, then add to list.
-                            detailedScanLine.DSSDone = false
-                            this.currentLocation.bodies.push(Object.assign(new Body, detailedScanLine))
+                            // Body was not already logged, so add to list.
+                            this.location.bodies.push(Object.assign(new Body, detailedScanLine))
                         }
                     }
 
@@ -122,21 +122,20 @@ export class JournalInterface extends EventEmitter {
                         detailedScanLine = line
 
                     } else if (line.StarType !== undefined) { // Save stars to bodies list.
-                        this.currentLocation.bodies.push(Object.assign(new Body, line))
+                        this.location.bodies.push(Object.assign(new Body, line))
 
                     } else if (line.ScanType === 'AutoScan') { // Save auto/discovery scan bodies.
                         // Check if planet, and then do the duplicate check (otherwise it's an
                         // astroid, as we've already accounted for stars).
                         if (line.PlanetClass !== undefined) {
-                            let r = find(this.currentLocation.bodies, ['BodyID', line.BodyID])
+                            let r = find(this.location.bodies, ['BodyID', line.BodyID])
 
                             if (r === undefined) {
-                                line.DSSDone = false
-                                this.currentLocation.bodies.push(Object.assign(new Body, line))
+                                this.location.bodies.push(Object.assign(new Body, line))
                             }
 
                         } else { // Asteroids.
-                            this.currentLocation.bodies.push(Object.assign(new Body, line))
+                            this.location.bodies.push(Object.assign(new Body, line))
                         }
                     }
                 } else if (line.event === 'FSDJump') {
@@ -144,8 +143,13 @@ export class JournalInterface extends EventEmitter {
                     return false
                 }
             }
+        }).then(() => {
+            log('Scanned bodies found.')
+            this.emit('INIT_COMPLETE')
         })
     }
+
+    /* ---------------------------------------------------------------------- watchDirectory ---- */
 
     // Set up journal directory watcher to catch new journal files as the game seems to sometimes
     // make more than one journal per day.
@@ -158,15 +162,72 @@ export class JournalInterface extends EventEmitter {
         log('Watching journal folder for changes...')
     }
 
+    /* ----------------------------------------------------------------------- parseScanLine ---- */
+
+    // Parse and handle scan lines.
+    parseScanLine(line, DSS = false) {
+        const dupChecker = {'BodyName': line.BodyName, 'BodyID': line.bodyID}
+
+        // If it's a DSS scan, then we should have already added the body to the list. But we'll
+        // check to make sure.
+        if (DSS) {
+            // Using findIndex() rather than find() so we can edit the body if found
+            let body = findIndex(this.location.bodies, dupChecker)
+
+            if (body > -1) { // Body was found in list, so simply toggle the DSS flag.
+                this.location.bodies[body].DSSDone = true
+            } else { // Body was missed on initial journal scan, so add it to the list.
+                line.DSSDone = true
+                this.location.bodies.push(Object.assign(new Body, line))
+            }
+            
+        }  else { // Otherwise it's an FSS or auto scan, and needs to be added to the list.
+            // Probably overkill, but do a duplicate check just in case.
+            let r = find(this.location.bodies, dupChecker)
+            
+            if (r === undefined) {
+                this.location.bodies.push(Object.assign(new Body, line))
+            }
+        }
+
+        log(`Scan detected. Body: ${line.BodyName}.`)
+        log(this.location.bodies)
+    }
+
+    /* -----------------------------------------------------------------------0000 parseLine ---- */
+
     // Parse and handle journal lines.
     parseLine(raw) {
         const line = JSON.parse(raw)
-        
-        if (line.event === 'FSDJump') {
-            this.currentLocation = new System(line.StarSystem)
-            this.emit('FSDJump')
+        let DSSFlag = false
+
+        switch (line.event) {
+            // CMDR jumped to new system, so update current location.
+            case 'FSDJump': {
+                this.location = new System(line.StarSystem)
+                this.emit('ENTERED_NEW_SYSTEM')
+                break
+            }
+
+            // CMDR completed DSS scan, so set flag for when next line processes and we want to
+            // figure out what kind of scan occurred.
+            case 'SAAScanComplete': {
+                DSSFlag = true
+                break
+            }
+
+            // A scan occurred, so let's hand that info off to the appropriate function and then
+            // reset the DSS flag.
+            case 'Scan': {
+                this.parseScanLine(line, DSSFlag)
+                this.emit('BODY_SCANNED')
+                DSSFlag = false
+                break
+            }
         }
     }
+
+    /* ------------------------------------------------------------------------ watchJournal ---- */
 
     // Watch the journal for changes.
     watchJournal() {
@@ -174,7 +235,7 @@ export class JournalInterface extends EventEmitter {
 
         log(`Watching ${path.basename(this.currentJournal)}...`)
 
-        tail.on('line', data => this.parseLine(data))
-        tail.on('error', err => console.log(err))
+        tail.on('line', data => data ? this.parseLine(data) : undefined)
+        tail.on('error', err => log(`Tail error in JournalInterface.watchJournal(): ${err}`))
     }
 }

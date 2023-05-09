@@ -18,6 +18,10 @@ body {
     opacity: 0;
 }
 
+.hidden {
+    display: none;
+}
+
 .system {
     margin-top: 1px;
     margin-bottom: 1px;
