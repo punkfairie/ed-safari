@@ -18,7 +18,13 @@ const findIndex = require('lodash/findIndex')
 const log = console.log.bind(console)
 
 export class JournalInterface extends EventEmitter {
-    constructor(isPackaged) {
+    journalDir: null|string
+    journalPattern: string
+    currentJournal: string
+    location: null|System
+
+
+    constructor(isPackaged: boolean) {
         super()
 
         this.journalDir = null
@@ -35,6 +41,7 @@ export class JournalInterface extends EventEmitter {
         this.journalPattern = this.journalDir + "Journal.*.log"
 
         this.currentJournal = this.getLatestJournal()
+        log(`New journal file found, now watching ${path.basename(this.currentJournal)}.`)
 
         // LineReader seems to be async, so start async processes here.
         this.location = null
@@ -46,22 +53,20 @@ export class JournalInterface extends EventEmitter {
     /* -------------------------------------------------------------------- getLatestJournal ---- */
 
     // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
-    getLatestJournal() {
+    getLatestJournal(): string {
         const journals = globSync(this.journalPattern)
 
         return max(journals, file => {
             const fullPath = path.join(this.journalDir, file)
             return fs.statSync(fullPath).mtime
         })
-
-        log(`New journal file found, now watching ${path.basename(this.currentJournal)}.`)
     }
 
     /* ------------------------------------------------------------------ getCurrentLocation ---- */
 
     // Get current location on setup, so if app is restarted, user can pick up where they left off
     // Rather than waiting til they jump to the next system to use the program again.
-    getCurrentLocation() {
+    getCurrentLocation(): void {
         lineReader.eachLine(this.currentJournal, (raw, last) => {            
             if (raw) { // skip blank line at end of file
                 const line = JSON.parse(raw)
@@ -85,8 +90,8 @@ export class JournalInterface extends EventEmitter {
     /* -------------------------------------------------------------------- getScannedBodies ---- */
 
     // Look for all scanned bodies before last FSDJump, for same reasons as getCurrentLocation().
-    getScannedBodies() {
-        let detailedScanLine = null
+    getScannedBodies(): void {
+        let detailedScanLine: Object|null = null
 
         lineReader.eachLine(this.currentJournal, (raw, last) => {
             
