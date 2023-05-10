@@ -1,6 +1,10 @@
 export class Body {
-    constructor() {
+    constructor(journalLine = null) {
         this.DSSDone = false
+
+        if (journalLine !== null) {
+            Object.assign(this, journalLine)
+        }
     }
 
     /* -------------------------------------------------------------------------- isAsteroid ---- */

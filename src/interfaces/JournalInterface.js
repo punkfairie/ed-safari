@@ -98,14 +98,14 @@ export class JournalInterface extends EventEmitter {
                     if (line.event === 'SAAScanComplete') {
                         // This was a DSS, so set the DSS flag to true and add to list.
                         detailedScanLine.DSSDone = true
-                        this.location.bodies.push(Object.assign(new Body, detailedScanLine))
+                        this.location.bodies.push(new Body(detailedScanLine))
                     } else {
                         // Else, check that the body hasn't already been added (by a DSS scan line).
                         let r = find(this.location.bodies, {'BodyName': detailedScanLine.BodyName, 'BodyID': detailedScanLine.BodyID})
 
                         if (r === undefined) {
                             // Body was not already logged, so add to list.
-                            this.location.bodies.push(Object.assign(new Body, detailedScanLine))
+                            this.location.bodies.push(new Body(detailedScanLine))
                         }
                     }
 
@@ -122,7 +122,7 @@ export class JournalInterface extends EventEmitter {
                         detailedScanLine = line
 
                     } else if (line.StarType !== undefined) { // Save stars to bodies list.
-                        this.location.bodies.push(Object.assign(new Body, line))
+                        this.location.bodies.push(new Body(line))
 
                     } else if (line.ScanType === 'AutoScan') { // Save auto/discovery scan bodies.
                         // Check if planet, and then do the duplicate check (otherwise it's an
@@ -131,11 +131,11 @@ export class JournalInterface extends EventEmitter {
                             let r = find(this.location.bodies, ['BodyID', line.BodyID])
 
                             if (r === undefined) {
-                                this.location.bodies.push(Object.assign(new Body, line))
+                                this.location.bodies.push(new Body(line))
                             }
 
                         } else { // Asteroids.
-                            this.location.bodies.push(Object.assign(new Body, line))
+                            this.location.bodies.push(new Body(line))
                         }
                     }
                 } else if (line.event === 'FSDJump') {
@@ -180,7 +180,7 @@ export class JournalInterface extends EventEmitter {
                 body.DSSDone = true
             } else { // Body was missed on initial journal scan, so add it to the list.
                 line.DSSDone = true
-                body = Object.assign(new Body, line)
+                body = new Body(line)
                 this.location.bodies.push(body)
             }
             
@@ -189,13 +189,19 @@ export class JournalInterface extends EventEmitter {
             let r = find(this.location.bodies, dupChecker)
             
             if (r === undefined) {
-                body = Object.assign(new Body, line)
+                body = new Body(line)
                 this.location.bodies.push(body)
             }
         }
 
         log(`Scan detected. Body: ${line.BodyName}.`)
         this.emit('BODY_SCANNED', body, DSS)
+    }
+
+    /* ------------------------------------------------------------------------- getNavRoute ---- */
+
+    getNavRoute() {
+
     }
 
     /* --------------------------------------------------------------------------- parseLine ---- */
@@ -226,6 +232,11 @@ export class JournalInterface extends EventEmitter {
             case 'Scan': {
                 this.parseScanLine(line, DSSFlag)
                 DSSFlag = false
+                break
+            }
+
+            case 'NavRoute': {
+                this.getNavRoute()
                 break
             }
         }

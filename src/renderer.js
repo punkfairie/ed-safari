@@ -33,6 +33,7 @@ import './icons/flaticon.css'
 const { app } = require('electron')
 import { JournalInterface } from './interfaces/JournalInterface'
 import { createBodyRow } from './ui'
+import { Body } from './models/Body'
 
 // Grab app.isPackaged from main process
 let isPackaged = false
@@ -53,6 +54,9 @@ if (journal.journalDir === null) {
 journal.watchDirectory()
 journal.watchJournal()
 
+const test = {name: 'Test', ID: 'TestID'}
+console.log(new Body(test))
+
 /* --------------------------------------------------------------------------- init complete ---- */
 
 journal.once('INIT_COMPLETE', () => {
@@ -66,7 +70,7 @@ journal.once('INIT_COMPLETE', () => {
         $('#currentSystemIcon').removeClass('hidden')
     }
 
-    if (journal.location.bodies.length > 0) {
+    if (journal.location?.bodies?.length > 0) {
         journal.location.bodies.forEach((body) => {
             const row = createBodyRow(body)
             // TODO APPRAISAL DATA
