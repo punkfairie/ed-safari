@@ -74,7 +74,7 @@ export interface starScan<scanType> extends journalEntry<'Scan'> {
     RotationPeriod: number,
     AxialTilt: number,
     WasDiscovered: boolean,
-    WasMapped: false,
+    WasMapped: boolean,
 }
 
 export interface asteroidScan<scanType> extends journalEntry<'Scan'> {
@@ -86,7 +86,7 @@ export interface asteroidScan<scanType> extends journalEntry<'Scan'> {
     SystemAddress: number,
     DistanceFromArrivalLS: number,
     WasDiscovered: boolean,
-    WasMapped: false,
+    WasMapped: boolean,
 }
 
 export interface planetScan<scanType> extends journalEntry<'Scan'> {

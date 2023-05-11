@@ -1,8 +1,9 @@
-import type { autoScan, detailedScan } from "../@types/journalLines"
+import type { asteroidScan, autoScan, detailedScan, planetScan, starScan } from "../@types/journalLines"
 
+export interface Body extends starScan<'AutoScan'|'DetailedScan'>, asteroidScan<'AutoScan'|'DetailedScan'>, planetScan<'AutoScan'|'DetailedScan'> {}
 export class Body {
     DSSDone: boolean
-    
+
     constructor(journalLine: autoScan|detailedScan|null = null, DSS: boolean = false) {
         this.DSSDone = DSS
 
@@ -13,26 +14,26 @@ export class Body {
 
     /* -------------------------------------------------------------------------- isAsteroid ---- */
 
-    isAsteroid() {
+    isAsteroid(): boolean {
         return this.BodyName.includes('Belt')
     }
 
     /* ---------------------------------------------------------------------------- isPlanet ---- */
 
-    isPlanet() {
+    isPlanet(): boolean {
         return !!this.PlanetClass
     }
 
     /* ------------------------------------------------------------------------------ isStar ---- */
 
-    isStar() {
+    isStar(): boolean {
         return !!this.StarType
     }
 
     /* ---------------------------------------------------------------------------- nameIcon ---- */
 
-    nameIcon() {
-        let nameIcon = null
+    nameIcon(): string|null {
+        let nameIcon: string|null = null
 
         if (this.isAsteroid()) {
             nameIcon = 'asteroid-4'
@@ -47,19 +48,19 @@ export class Body {
 
     /* -------------------------------------------------------------------------- simpleName ---- */
 
-    simpleName() {
+    simpleName(): string {
         return this.BodyName.replace(this.StarSystem, '')
     }
 
     /* ---------------------------------------------------------------------------- typeIcon ---- */
 
-    typeIcon() {
-        let typeIcon = null
+    typeIcon(): string|null {
+        let typeIcon: string|null = null
 
         if (this.isStar() || this.isAsteroid()) {
             typeIcon = this.nameIcon()
         } else {
-            const planetClass = this.PlanetClass.toLowerCase()
+            const planetClass: string = this.PlanetClass.toLowerCase()
 
             if (planetClass.includes('metal')) {
                 typeIcon = 'ingot'
@@ -81,7 +82,7 @@ export class Body {
 
     /* ---------------------------------------------------------------------------- distance ---- */
 
-    distance() {
+    distance(): string {
         return Intl.NumberFormat().format(Math.round(this.DistanceFromArrivalLS))
     }
 }
