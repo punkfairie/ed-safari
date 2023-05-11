@@ -1,6 +1,10 @@
+import type { autoScan, detailedScan } from "../@types/journalLines"
+
 export class Body {
-    constructor(journalLine = null) {
-        this.DSSDone = false
+    DSSDone: boolean
+    
+    constructor(journalLine: autoScan|detailedScan|null = null, DSS: boolean = false) {
+        this.DSSDone = DSS
 
         if (journalLine !== null) {
             Object.assign(this, journalLine)

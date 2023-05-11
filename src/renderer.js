@@ -55,12 +55,11 @@ journal.watchDirectory()
 journal.watchJournal()
 
 const test = {name: 'Test', ID: 'TestID'}
-console.log(new Body(test))
 
 /* --------------------------------------------------------------------------- init complete ---- */
 
 journal.once('INIT_COMPLETE', () => {
-    if (journal.location !== null) {
+    if (journal.location.name !== 'Unknown') {
         $('#currentSystem')
             .addClass('charted')
             .removeClass('highlighted text-center')

@@ -1,17 +1,17 @@
+import { Tail as TailType } from 'tail'
+import type { autoScan, completeFsdJump, detailedScan, journalEntry, planetScan } from '../@types/journalLines'
 import { Body } from '../models/Body'
 import { System } from '../models/System'
 
 const EventEmitter = require('events')
 const fs = require('fs')
 const path = require('path')
-const max = require('lodash/max')
-const { globSync } = require('glob')
+import { globSync } from 'glob'
 const os = require('os')
 const lineReader = require('reverse-line-reader')
 const chokidar = require('chokidar')
 const Tail = require('tail').Tail
-const find = require('lodash/find')
-const findIndex = require('lodash/findIndex')
+import { maxBy, findIndex, find } from 'lodash'
 
 // Set log() to console.log() so whenever I get around to setting up a log file, I don't have to
 // search and replace all the console.log()'s.
@@ -20,8 +20,8 @@ const log = console.log.bind(console)
 export class JournalInterface extends EventEmitter {
     journalDir: null|string
     journalPattern: string
-    currentJournal: string
-    location: null|System
+    currentJournal: string|undefined
+    location: System
 
 
     constructor(isPackaged: boolean) {
@@ -44,7 +44,7 @@ export class JournalInterface extends EventEmitter {
         log(`New journal file found, now watching ${path.basename(this.currentJournal)}.`)
 
         // LineReader seems to be async, so start async processes here.
-        this.location = null
+        this.location = new System('Unknown')
 
         log('JournalInterface initialized. Attempting to find current location.')
         this.getCurrentLocation()
@@ -53,10 +53,10 @@ export class JournalInterface extends EventEmitter {
     /* -------------------------------------------------------------------- getLatestJournal ---- */
 
     // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
-    getLatestJournal(): string {
+    getLatestJournal(): string|undefined {
         const journals = globSync(this.journalPattern)
 
-        return max(journals, file => {
+        return maxBy(journals, file => {
             const fullPath = path.join(this.journalDir, file)
             return fs.statSync(fullPath).mtime
         })
@@ -67,7 +67,7 @@ export class JournalInterface extends EventEmitter {
     // Get current location on setup, so if app is restarted, user can pick up where they left off
     // Rather than waiting til they jump to the next system to use the program again.
     getCurrentLocation(): void {
-        lineReader.eachLine(this.currentJournal, (raw, last) => {            
+        lineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {            
             if (raw) { // skip blank line at end of file
                 const line = JSON.parse(raw)
 
@@ -82,8 +82,10 @@ export class JournalInterface extends EventEmitter {
                 }
             }
         }).then(() => {
-            log('Attempting to find scanned bodies in current system.')
-            this.getScannedBodies()
+            if (this.location) {
+                log('Attempting to find scanned bodies in current system.')
+                this.getScannedBodies()
+            }
         })
     }
 
@@ -91,22 +93,22 @@ export class JournalInterface extends EventEmitter {
 
     // Look for all scanned bodies before last FSDJump, for same reasons as getCurrentLocation().
     getScannedBodies(): void {
-        let detailedScanLine: Object|null = null
+        let detailedScanLine: detailedScan|null = null
 
-        lineReader.eachLine(this.currentJournal, (raw, last) => {
+        lineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
             
             if (raw) { // Skip blank line at end of file.
-                const line = JSON.parse(raw)
+                const line: journalEntry = JSON.parse(raw)
 
                 // Check if previous line was ScanType = Detailed, and handle that.
                 if (detailedScanLine !== null) {
                     if (line.event === 'SAAScanComplete') {
-                        // This was a DSS, so set the DSS flag to true and add to list.
-                        detailedScanLine.DSSDone = true
-                        this.location.bodies.push(new Body(detailedScanLine))
+                        // This was a DSS, so add to list with DSS flag set to true.
+                        this.location.bodies.push(new Body(detailedScanLine, true))
                     } else {
                         // Else, check that the body hasn't already been added (by a DSS scan line).
-                        let r = find(this.location.bodies, {'BodyName': detailedScanLine.BodyName, 'BodyID': detailedScanLine.BodyID})
+                        let dupChecker = {'BodyName': detailedScanLine.BodyName, 'BodyID': detailedScanLine.BodyID}
+                        let r = find(this.location.bodies, dupChecker)
 
                         if (r === undefined) {
                             // Body was not already logged, so add to list.
@@ -119,28 +121,29 @@ export class JournalInterface extends EventEmitter {
                 }
 
                 // Now move on to evaluating the current line.
-                if (line.event === 'Scan') {
+                if (line.event === 'Scan' && 'ScanType' in line) {
                     // If ScanType = Detailed and body is not a star, save the line so we can check 
                     // the one immediately above for event = SAAScanComplete, which indicates this 
                     // was a DSS.
-                    if (line.ScanType === 'Detailed' && line.StarType === undefined) {
-                        detailedScanLine = line
+                    if (line.ScanType === 'Detailed' && !('StarType' in line)) {
+                        detailedScanLine = (line as detailedScan)
 
-                    } else if (line.StarType !== undefined) { // Save stars to bodies list.
-                        this.location.bodies.push(new Body(line))
+                    } else if ('StarType' in line) { // Save stars to bodies list.
+                        this.location.bodies.push(new Body((line as autoScan|detailedScan)))
 
                     } else if (line.ScanType === 'AutoScan') { // Save auto/discovery scan bodies.
                         // Check if planet, and then do the duplicate check (otherwise it's an
                         // astroid, as we've already accounted for stars).
-                        if (line.PlanetClass !== undefined) {
-                            let r = find(this.location.bodies, ['BodyID', line.BodyID])
+                        if ('PlanetClass' in line) {
+                            let dupChecker = {'BodyName': (line as planetScan<'AutoScan'>).BodyName, 'BodyID': (line as planetScan<'AutoScan'>).BodyID}
+                            let r = find(this.location.bodies, dupChecker)
 
                             if (r === undefined) {
-                                this.location.bodies.push(new Body(line))
+                                this.location.bodies.push(new Body((line as autoScan)))
                             }
 
                         } else { // Asteroids.
-                            this.location.bodies.push(new Body(line))
+                            this.location.bodies.push(new Body((line as autoScan)))
                         }
                     }
                 } else if (line.event === 'FSDJump') {
@@ -159,10 +162,10 @@ export class JournalInterface extends EventEmitter {
     // Set up journal directory watcher to catch new journal files as the game seems to sometimes
     // make more than one journal per day.
     // Also for instances where UTC day switches over mid-play session.
-    watchDirectory() {
+    watchDirectory(): void {
         const watcher = chokidar.watch(this.journalPattern, {usePolling: true, persistent: true})
         
-        watcher.on('add', newFile => this.currentJournal = this.getLatestJournal())
+        watcher.on('add', () => this.currentJournal = this.getLatestJournal())
 
         log('Watching journal folder for changes...')
     }
@@ -170,22 +173,22 @@ export class JournalInterface extends EventEmitter {
     /* ----------------------------------------------------------------------- parseScanLine ---- */
 
     // Parse and handle scan lines.
-    parseScanLine(line, DSS = false) {
-        const dupChecker = {'BodyName': line.BodyName, 'BodyID': line.bodyID}
-        let body = null
+    parseScanLine(line: autoScan|detailedScan, DSS: boolean = false) {
+        const dupChecker = {'BodyName': line.BodyName, 'BodyID': line.BodyID}
+        let body: Body|null = null
 
         // If it's a DSS scan, then we should have already added the body to the list. But we'll
         // check to make sure.
         if (DSS) {
-            // Using findIndex() rather than find() so we can edit the body if found
-            let bodyIndex = findIndex(this.location.bodies, dupChecker)
+            // Using findIndex() rather than find() so we can edit the body if found.
+            // @ts-ignore since it doesn't understand dupChecker is a valid predicate.
+            let bodyIndex: number = findIndex(this.location.bodies, dupChecker)
 
             if (bodyIndex > -1) { // Body was found in list, so simply toggle the DSS flag.
-                body = this.location.bodies[bodyIndex]
+                body = (this.location.bodies[bodyIndex] as Body)
                 body.DSSDone = true
             } else { // Body was missed on initial journal scan, so add it to the list.
-                line.DSSDone = true
-                body = new Body(line)
+                body = new Body(line, true)
                 this.location.bodies.push(body)
             }
             
@@ -212,14 +215,14 @@ export class JournalInterface extends EventEmitter {
     /* --------------------------------------------------------------------------- parseLine ---- */
 
     // Parse and handle journal lines.
-    parseLine(raw) {
-        const line = JSON.parse(raw)
-        let DSSFlag = false
+    parseLine(raw: string) {
+        const line: journalEntry = JSON.parse(raw)
+        let DSSFlag: boolean = false
 
         switch (line.event) {
             // CMDR jumped to new system, so update current location.
             case 'FSDJump': {
-                this.location = new System(line.StarSystem)
+                this.location = new System((line as completeFsdJump).StarSystem)
                 log(`FSD Jump detected, current location updated to ${this.location.name}.`)
                 this.emit('ENTERED_NEW_SYSTEM')
                 break
@@ -235,7 +238,7 @@ export class JournalInterface extends EventEmitter {
             // A scan occurred, so let's hand that info off to the appropriate function and then
             // reset the DSS flag.
             case 'Scan': {
-                this.parseScanLine(line, DSSFlag)
+                this.parseScanLine((line as autoScan|detailedScan), DSSFlag)
                 DSSFlag = false
                 break
             }
@@ -250,8 +253,8 @@ export class JournalInterface extends EventEmitter {
     /* ------------------------------------------------------------------------ watchJournal ---- */
 
     // Watch the journal for changes.
-    watchJournal() {
-        const tail = new Tail(this.currentJournal, {useWatchFile: true})
+    watchJournal(): void {
+        const tail: TailType = new Tail(this.currentJournal, {useWatchFile: true})
 
         log(`Watching ${path.basename(this.currentJournal)}...`)
 

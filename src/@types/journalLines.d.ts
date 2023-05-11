@@ -132,9 +132,10 @@ export interface planetScan<scanType> extends journalEntry<'Scan'> {
 }
 
 export type autoScan = starScan<'AutoScan'> & asteroidScan<'AutoScan'> & planetScan<'AutoScan'>
-export type discoveryScan = starScan<'Detailed'> & asteroidScan<'Detailed'> & planetScan<'Detailed'>
-export type fssScan = starScan<'Detailed'> & asteroidScan<'Detailed'> & planetScan<'Detailed'>
-export type dssScan = starScan<'Detailed'> & asteroidScan<'Detailed'> & planetScan<'Detailed'>
+export type detailedScan = starScan<'Detailed'> & asteroidScan<'Detailed'> & planetScan<'Detailed'>
+export type discoveryScan = detailedScan
+export type fssScan = detailedScan
+export type dssScan = detailedScan
 
 export interface startFsdJump extends journalEntry<'StartJump'> {
     JumpType: 'Hyperspace',
