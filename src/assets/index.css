@@ -112,6 +112,7 @@ div b.active.landable {
     border-color: #F5A804;
     border-width: 1px 0px 1px 0px;
     text-shadow: 0px 0px 3px;
+    opacity: 100%;
 }
 
 .next-system {
