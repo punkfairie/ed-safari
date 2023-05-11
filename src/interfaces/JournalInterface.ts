@@ -76,15 +76,31 @@ export class JournalInterface extends EventEmitter {
                     this.emit('ENTERED_NEW_SYSTEM')
                     return false
                 } else if (last) {
-                    log('Warning: unable to find last hyperspace jump. Current location unknown.')
+                    log('Unable to find last hyperspace jump. Searching for last known location.')
                     return false
                 }
             }
         }).then(() => {
-            if (this.location.name !== 'Unknown') {
-                log('Attempting to find scanned bodies in current system.')
-                this.getScannedBodies()
-            }
+            lineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
+                if (raw) {
+                    const line = JSON.parse(raw)
+
+                    if (line.event === 'Location') {
+                        this.location = new System(line.StarSystem)
+                        log(`Current location set to ${this.location.name}.`)
+                        this.emit('ENTERED_NEW_SYSTEM')
+                        return false
+                    } else if (last) {
+                        log('WARNING: Unable to find last known location.')
+                        return false
+                    }
+                }
+            }).then(() => {
+                if (this.location.name !== 'Unknown') {
+                    log('Attempting to find scanned bodies in current system.')
+                    this.getScannedBodies()
+                }
+            })
         })
     }
 
