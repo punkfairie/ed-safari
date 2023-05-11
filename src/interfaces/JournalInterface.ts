@@ -6,7 +6,7 @@ import { System } from '../models/System'
 const EventEmitter = require('events')
 const fs = require('fs')
 const path = require('path')
-import { globSync } from 'glob'
+const { globSync } = require('glob')
 const os = require('os')
 const lineReader = require('reverse-line-reader')
 const chokidar = require('chokidar')
@@ -57,8 +57,7 @@ export class JournalInterface extends EventEmitter {
         const journals = globSync(this.journalPattern)
 
         return maxBy(journals, file => {
-            const fullPath = path.join(this.journalDir, file)
-            return fs.statSync(fullPath).mtime
+            return fs.statSync(file).mtime
         })
     }
 
@@ -82,7 +81,7 @@ export class JournalInterface extends EventEmitter {
                 }
             }
         }).then(() => {
-            if (this.location) {
+            if (this.location.name !== 'Unknown') {
                 log('Attempting to find scanned bodies in current system.')
                 this.getScannedBodies()
             }

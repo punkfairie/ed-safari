@@ -32,7 +32,7 @@ import './icons/flaticon.css'
 
 const { app } = require('electron')
 import { JournalInterface } from './interfaces/JournalInterface'
-import { createBodyRow } from './ui'
+import { UI } from './models/UI'
 import { Body } from './models/Body'
 
 // Grab app.isPackaged from main process
@@ -71,7 +71,7 @@ journal.once('INIT_COMPLETE', () => {
 
     if (journal.location?.bodies?.length > 0) {
         journal.location.bodies.forEach((body) => {
-            const row = createBodyRow(body)
+            const row = UI.createBodyRow(body)
             // TODO APPRAISAL DATA
             $('#lowValueScans').appendChild(row)
         })
@@ -98,13 +98,13 @@ journal.on('BODY_SCANNED', (body, DSS) => {
         if (bodyRow.length > 0) { // check just in case body was missed in earlier scans
             bodyRow.removeClass('highlighted uncharted').addClass('charted')
         } else {
-            const row = createBodyRow(body)
+            const row = UI.createBodyRow(body)
             // TODO APPRAISAL DATA
             $('#lowValueScans').appendChild(row)
         }
 
     } else { // else it's an FSS/auto scan and won't be in the list yet
-        const row = createBodyRow(body)
+        const row = UI.createBodyRow(body)
         // TODO APPRAISAL DATA
         $('#lowValueScans').appendChild(row)
     }
