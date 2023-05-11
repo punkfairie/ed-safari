@@ -115,4 +115,18 @@ journal.on('BODY_SCANNED', (body, DSS) => {
 
 journal.on('SET_NAV_ROUTE', () => {
     // clear previous nav route, if any
+    $('#navRoute').children().remove()
+
+    if (journal.navRoute.length > 1) {
+        journal.navRoute.forEach((system) => {
+            // duplicate check
+            // CSS.escape is needed since CSS technically doesn't allow numeric IDs
+            const systemRow = $(`#${CSS.escape(system.SystemAddress)}`)
+
+            if (systemRow.length === 0) {
+                const row = UI.createSystemRow(system)
+                $('#navRoute').appendChild(row)
+            }
+        })
+    }
 })

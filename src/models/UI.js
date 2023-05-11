@@ -55,7 +55,7 @@ export class UI {
         row.appendChild($('<div>').addClass('col-1 system'))
 
         // name
-        const name = $('<div>').addClass(`col-2 text-left system ${chartedStyle}`)
+        const name = $('<div>').addClass(`col-2 text-start system ${chartedStyle}`)
         name.appendChild($('<i>')).addClass(`flaticon-${body.nameIcon()}`)
         name.appendChild($('<span>')).text(body.simpleName())
         row.appendChild(name)
@@ -94,7 +94,30 @@ export class UI {
         row.appendChild(info)
 
         // mapped value
-        const value = $('<div>').addClass(`col-2 text-right system ${chartedStyle}`)
+        // TODO APPRAISAL DATA
+        const value = $('<div>').addClass(`col-2 text-end system ${chartedStyle}`)
+        row.appendChild(value)
+
+        return row
+    }
+
+    /* --------------------------------------------------------------------- createSystemRow ---- */
+
+    static createSystemRow(system) {
+        const row = $('<div>').addClass('row ms-1 me-1')
+        row.attr('id', system.SystemAddress)
+        // TODO APPRAISAL DATA
+        const chartedStyle = 'charted'
+
+        // name
+        const name = $('<div>').addClass(`col system ${chartedStyle}`)
+        name.appendChild($('<i>').addClass('flaticon-solar-system'))
+        name.appendChild($('<span>').text(` ${system.name}`))
+        row.appendChild(name)
+
+        // mapped value
+        // TODO APPRAISAL DATA
+        const value = $('<div>').addClass(`col-2 text-end system ${chartedStyle}`)
         row.appendChild(value)
 
         return row

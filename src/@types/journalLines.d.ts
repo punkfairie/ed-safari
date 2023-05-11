@@ -179,11 +179,35 @@ export interface completeFsdJump extends journalEntry<'FSDJump'> {
     JumpDist: number,
     FuelUsed: number,
     FuelLevel: number,
+    Factions?: faction[],
+    SystemFaction?: {Name: string},
+}
+
+export interface location extends journalEntry<'Location'> {
+    Docked: boolean,
+    Taxi: boolean,
+    Multicrew: boolean,
+    StarSystem: string,
+    SystemAddress: number,
+    StarPos: [number, number, number],
+    SystemAllegiance: string,
+    SystemEconomy: string,
+    SystemEconomy_Localised: string,
+    SystemSecondEconomy: string,
+    SystemSecondEconomy_Localised: string,
+    SystemGovernment: string,
+    SystemGovernment_Localised: string,
+    SystemSecurity: string,
+    SystemSecurity_Localised: string,
+    Population: number,
+    Body: string,
+    BodyID: string,
+    BodyType: string,
     Factions: faction[],
     SystemFaction: {Name: string},
 }
 
-interface navRouteSystem {
+export interface navRouteSystem {
     StarSystem: string,
     SystemAddress: number,
     StarPos: [number, number, number],

@@ -241,16 +241,16 @@ export class JournalInterface extends EventEmitter {
             const route: navRoute = JSON.parse(routeFile)
 
             route.Route.forEach((system) => {
-                this.navRoute.push(new System(system.StarSystem, system.StarClass))
+                this.navRoute.push(new System(system))
             })
 
             log('NavRoute set.')
 
             if (init) {
                 this.emit('INIT_COMPLETE')
-            } else {
-                this.emit('SET_NAV_ROUTE')
             }
+
+            this.emit('SET_NAV_ROUTE')
         }
     }
 
@@ -264,7 +264,7 @@ export class JournalInterface extends EventEmitter {
         switch (line.event) {
             // CMDR jumped to new system, so update current location.
             case 'FSDJump': {
-                this.location = new System((line as completeFsdJump).StarSystem)
+                this.location = new System((line as completeFsdJump))
                 log(`FSD Jump detected, current location updated to ${this.location.name}.`)
                 this.emit('ENTERED_NEW_SYSTEM')
                 break
