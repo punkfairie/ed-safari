@@ -1,17 +1,19 @@
-import { Tail as TailType } from 'tail'
-import type { autoScan, completeFsdJump, detailedScan, journalEntry, planetScan } from '../@types/journalLines'
+import type { Tail as TailType } from 'tail'
+import type { autoScan, completeFsdJump, detailedScan, journalEntry, navRoute, planetScan } from '../@types/journalLines'
+
+const chokidar = require('chokidar')
+const EventEmitter = require('node:events')
+const fs = require('node:fs')
+const { globSync } = require('glob')
+import { maxBy, findIndex, find } from 'lodash'
+const os = require('node:os')
+const path = require('node:path')
+const { readFile } = require('node:fs/promises')
+const reverseLineReader = require('reverse-line-reader')
+const Tail = require('tail').Tail
+
 import { Body } from '../models/Body'
 import { System } from '../models/System'
-
-const EventEmitter = require('events')
-const fs = require('fs')
-const path = require('path')
-const { globSync } = require('glob')
-const os = require('os')
-const lineReader = require('reverse-line-reader')
-const chokidar = require('chokidar')
-const Tail = require('tail').Tail
-import { maxBy, findIndex, find } from 'lodash'
 
 // Set log() to console.log() so whenever I get around to setting up a log file, I don't have to
 // search and replace all the console.log()'s.
@@ -22,6 +24,7 @@ export class JournalInterface extends EventEmitter {
     journalPattern: string
     currentJournal: string|undefined
     location: System
+    navRoute: System[]
 
 
     constructor(isPackaged: boolean) {
@@ -43,11 +46,15 @@ export class JournalInterface extends EventEmitter {
         this.currentJournal = this.getLatestJournal()
         log(`New journal file found, now watching ${path.basename(this.currentJournal)}.`)
 
+        this.navRoute = []
+
         // LineReader seems to be async, so start async processes here.
         this.location = new System('Unknown')
 
         log('JournalInterface initialized. Attempting to find current location.')
         this.getCurrentLocation()
+        // -> getScannedBodies()
+        // --> getNavRoute()
     }
 
     /* -------------------------------------------------------------------- getLatestJournal ---- */
@@ -56,9 +63,7 @@ export class JournalInterface extends EventEmitter {
     getLatestJournal(): string|undefined {
         const journals = globSync(this.journalPattern)
 
-        return maxBy(journals, file => {
-            return fs.statSync(file).mtime
-        })
+        return maxBy(journals, file => fs.statSync(file).mtime)
     }
 
     /* ------------------------------------------------------------------ getCurrentLocation ---- */
@@ -66,7 +71,7 @@ export class JournalInterface extends EventEmitter {
     // Get current location on setup, so if app is restarted, user can pick up where they left off
     // Rather than waiting til they jump to the next system to use the program again.
     getCurrentLocation(): void {
-        lineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {            
+        reverseLineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {            
             if (raw) { // skip blank line at end of file
                 const line = JSON.parse(raw)
 
@@ -81,7 +86,7 @@ export class JournalInterface extends EventEmitter {
                 }
             }
         }).then(() => {
-            lineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
+            reverseLineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
                 if (raw) {
                     const line = JSON.parse(raw)
 
@@ -110,7 +115,7 @@ export class JournalInterface extends EventEmitter {
     getScannedBodies(): void {
         let detailedScanLine: detailedScan|null = null
 
-        lineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
+        reverseLineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
             
             if (raw) { // Skip blank line at end of file.
                 const line: journalEntry = JSON.parse(raw)
@@ -168,7 +173,7 @@ export class JournalInterface extends EventEmitter {
             }
         }).then(() => {
             log('Scanned bodies found.')
-            this.emit('INIT_COMPLETE')
+            this.getNavRoute(true)
         })
     }
 
@@ -223,8 +228,30 @@ export class JournalInterface extends EventEmitter {
 
     /* ------------------------------------------------------------------------- getNavRoute ---- */
 
-    getNavRoute() {
+    async getNavRoute(init: boolean = false) {
+        let routeFile: string|null = null
 
+        try {
+            routeFile = await readFile(this.journalDir + 'NavRoute.json', { encoding: 'utf8' })
+        } catch (err) {
+            log(`Error getting NavRoute: ${err.message}.`)
+        }
+
+        if (routeFile) {
+            const route: navRoute = JSON.parse(routeFile)
+
+            route.Route.forEach((system) => {
+                this.navRoute.push(new System(system.StarSystem, system.StarClass))
+            })
+
+            log('NavRoute set.')
+
+            if (init) {
+                this.emit('INIT_COMPLETE')
+            } else {
+                this.emit('SET_NAV_ROUTE')
+            }
+        }
     }
 
     /* --------------------------------------------------------------------------- parseLine ---- */

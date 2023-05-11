@@ -34,6 +34,7 @@ const { app } = require('electron')
 import { JournalInterface } from './interfaces/JournalInterface'
 import { UI } from './models/UI'
 import { Body } from './models/Body'
+import { sep } from 'path'
 
 // Grab app.isPackaged from main process
 let isPackaged = false
@@ -108,4 +109,10 @@ journal.on('BODY_SCANNED', (body, DSS) => {
         // TODO APPRAISAL DATA
         $('#lowValueScans').appendChild(row)
     }
+})
+
+/* --------------------------------------------------------------------------- nav route set ---- */
+
+journal.on('SET_NAV_ROUTE', () => {
+    // clear previous nav route, if any
 })
