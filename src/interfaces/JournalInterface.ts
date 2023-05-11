@@ -5,7 +5,7 @@ const chokidar = require('chokidar')
 const EventEmitter = require('node:events')
 const fs = require('node:fs')
 const { globSync } = require('glob')
-import { maxBy, findIndex, find } from 'lodash'
+import * as _ from 'lodash-es'
 const os = require('node:os')
 const path = require('node:path')
 const { readFile } = require('node:fs/promises')
@@ -63,7 +63,7 @@ export class JournalInterface extends EventEmitter {
     getLatestJournal(): string|undefined {
         const journals = globSync(this.journalPattern)
 
-        return maxBy(journals, file => fs.statSync(file).mtime)
+        return _.maxBy(journals, file => fs.statSync(file).mtime)
     }
 
     /* ------------------------------------------------------------------ getCurrentLocation ---- */
@@ -87,6 +87,12 @@ export class JournalInterface extends EventEmitter {
             }
         }).then(() => {
             reverseLineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
+                // TODO: figure out if we can avoid entering eachLine() altogether? realyyy wish
+                // it returned a promise :(
+                if (this.location.name !== 'Unknown') {
+                    return false
+                }
+
                 if (raw) {
                     const line = JSON.parse(raw)
 
@@ -128,7 +134,7 @@ export class JournalInterface extends EventEmitter {
                     } else {
                         // Else, check that the body hasn't already been added (by a DSS scan line).
                         let dupChecker = {'BodyName': detailedScanLine.BodyName, 'BodyID': detailedScanLine.BodyID}
-                        let r = find(this.location.bodies, dupChecker)
+                        let r = _.find(this.location.bodies, dupChecker)
 
                         if (r === undefined) {
                             // Body was not already logged, so add to list.
@@ -156,7 +162,7 @@ export class JournalInterface extends EventEmitter {
                         // astroid, as we've already accounted for stars).
                         if ('PlanetClass' in line) {
                             let dupChecker = {'BodyName': (line as planetScan<'AutoScan'>).BodyName, 'BodyID': (line as planetScan<'AutoScan'>).BodyID}
-                            let r = find(this.location.bodies, dupChecker)
+                            let r = _.find(this.location.bodies, dupChecker)
 
                             if (r === undefined) {
                                 this.location.bodies.push(new Body((line as autoScan)))
@@ -203,7 +209,7 @@ export class JournalInterface extends EventEmitter {
         if (DSS) {
             // Using findIndex() rather than find() so we can edit the body if found.
             // @ts-ignore since it doesn't understand dupChecker is a valid predicate.
-            let bodyIndex: number = findIndex(this.location.bodies, dupChecker)
+            let bodyIndex: number = _.findIndex(this.location.bodies, dupChecker)
 
             if (bodyIndex > -1) { // Body was found in list, so simply toggle the DSS flag.
                 body = (this.location.bodies[bodyIndex] as Body)
@@ -215,7 +221,7 @@ export class JournalInterface extends EventEmitter {
             
         }  else { // Otherwise it's an FSS or auto scan, and needs to be added to the list.
             // Probably overkill, but do a duplicate check just in case.
-            let r = find(this.location.bodies, dupChecker)
+            let r = _.find(this.location.bodies, dupChecker)
             
             if (r === undefined) {
                 body = new Body(line)
@@ -257,6 +263,20 @@ export class JournalInterface extends EventEmitter {
         }
     }
 
+    /* ----------------------------------------------------------------------- handleFsdJump ---- */
+
+    handleFsdJump(line: completeFsdJump): void {
+        this.location = new System((line as completeFsdJump))
+        log(`FSD Jump detected, current location updated to ${this.location.name}.`)
+        this.emit('ENTERED_NEW_SYSTEM')
+
+        if (this.navRoute.length > 0) {
+            _.remove(this.navRoute, (system) => {
+                system.SystemAddress === this.location.SystemAddress
+            })
+        }
+    }
+
     /* --------------------------------------------------------------------------- parseLine ---- */
 
     // Parse and handle journal lines.
@@ -267,9 +287,7 @@ export class JournalInterface extends EventEmitter {
         switch (line.event) {
             // CMDR jumped to new system, so update current location.
             case 'FSDJump': {
-                this.location = new System((line as completeFsdJump))
-                log(`FSD Jump detected, current location updated to ${this.location.name}.`)
-                this.emit('ENTERED_NEW_SYSTEM')
+                this.handleFsdJump((line as completeFsdJump))
                 break
             }
 
