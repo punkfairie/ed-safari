@@ -46,3 +46,13 @@ COMPLETE HYPERSPACE JUMP - POPULATED SYSTEM
 
 COMPLETE HYPERSPACE JUMP - UNPOPULATED SYSTEM
 { "timestamp":"2023-05-08T19:13:52Z", "event":"FSDJump", "Taxi":false, "Multicrew":false, "StarSystem":"LHS 119", "SystemAddress":18262603605409, "StarPos":[-30.15625,-21.87500,-17.25000], "SystemAllegiance":"", "SystemEconomy":"$economy_None;", "SystemEconomy_Localised":"None", "SystemSecondEconomy":"$economy_None;", "SystemSecondEconomy_Localised":"None", "SystemGovernment":"$government_None;", "SystemGovernment_Localised":"None", "SystemSecurity":"$GAlAXY_MAP_INFO_state_anarchy;", "SystemSecurity_Localised":"Anarchy", "Population":0, "Body":"LHS 119 A", "BodyID":1, "BodyType":"Star", "JumpDist":8.575, "FuelUsed":0.982384, "FuelLevel":127.017616 }
+
+NAV ROUTE
+{ "timestamp":"2023-05-09T23:12:00Z", "event":"NavRoute" }
+
+NAVROUTE.JSON
+{ "timestamp":"2023-05-10T00:32:42Z", "event":"NavRoute", "Route":[ 
+{ "StarSystem":"LHS 1068", "SystemAddress":5068195571105, "StarPos":[-46.65625,-33.06250,-22.81250], "StarClass":"M" }, 
+{ "StarSystem":"Jastreb Sector SO-R a4-1", "SystemAddress":22954989472560, "StarPos":[-42.93750,-33.37500,-41.09375], "StarClass":"T" }, 
+{ "StarSystem":"LHS 1393", "SystemAddress":7267487262097, "StarPos":[-39.87500,-27.09375,-51.40625], "StarClass":"M" }
+ ] }

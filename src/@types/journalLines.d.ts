@@ -182,3 +182,16 @@ export interface completeFsdJump extends journalEntry<'FSDJump'> {
     Factions: faction[],
     SystemFaction: {Name: string},
 }
+
+interface navRouteSystem {
+    StarSystem: string,
+    SystemAddress: number,
+    StarPos: [number, number, number],
+    StarClass: string,
+}
+
+export interface navRoute {
+    timestamp: string,
+    event: 'NavRoute',
+    Route: navRouteSystem[],
+}
