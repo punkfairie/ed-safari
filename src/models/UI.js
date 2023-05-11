@@ -1,6 +1,20 @@
 export class UI {
     constructor() {}
 
+    /* -------------------------------------------------------------------- setCurrentSystem ---- */
+
+    static setCurrentSystem(system) {
+        if (system.name === 'Unknown') {
+            $('#currentSystem').removeClass('charted').addClass('highlighted text-center')
+            $('#currentSystemIcon').addClass('hidden')
+        } else {
+            $('#currentSystem').addClass('charted').removeClass('highlighted text-center')
+            $('#currentSystemIcon').removeClass('hidden')
+        }
+
+        $('#currentSystemName').text(system.name)
+    }
+
     /* -------------------------------------------------------------------------- buildRings ---- */
 
     static #buildRings(body) {

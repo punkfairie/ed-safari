@@ -76,7 +76,7 @@ export class JournalInterface extends EventEmitter {
                 const line = JSON.parse(raw)
 
                 if (line.event === 'FSDJump') {
-                    this.location = new System(line.StarSystem)
+                    this.location = new System(line)
                     log(`Current location set to ${this.location.name}.`)
                     this.emit('ENTERED_NEW_SYSTEM')
                     return false
@@ -91,7 +91,7 @@ export class JournalInterface extends EventEmitter {
                     const line = JSON.parse(raw)
 
                     if (line.event === 'Location') {
-                        this.location = new System(line.StarSystem)
+                        this.location = new System(line)
                         log(`Current location set to ${this.location.name}.`)
                         this.emit('ENTERED_NEW_SYSTEM')
                         return false
@@ -173,6 +173,7 @@ export class JournalInterface extends EventEmitter {
             }
         }).then(() => {
             log('Scanned bodies found.')
+            log('Reading current nav route.')
             this.getNavRoute(true)
         })
     }
@@ -234,17 +235,19 @@ export class JournalInterface extends EventEmitter {
         try {
             routeFile = await readFile(this.journalDir + 'NavRoute.json', { encoding: 'utf8' })
         } catch (err) {
-            log(`Error getting NavRoute: ${err.message}.`)
+            log(`Error reading nav route file: ${err.message}.`)
         }
 
         if (routeFile) {
             const route: navRoute = JSON.parse(routeFile)
 
             route.Route.forEach((system) => {
-                this.navRoute.push(new System(system))
+                if (system.SystemAddress !== this.location.SystemAddress) {
+                    this.navRoute.push(new System(system))
+                }
             })
 
-            log('NavRoute set.')
+            log('Nav route set.')
 
             if (init) {
                 this.emit('INIT_COMPLETE')
@@ -287,6 +290,12 @@ export class JournalInterface extends EventEmitter {
 
             case 'NavRoute': {
                 this.getNavRoute()
+                break
+            }
+
+            case 'NavRouteClear': {
+                this.navRoute = []
+                this.emit('SET_NAV_ROUTE')
                 break
             }
         }

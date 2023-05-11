@@ -60,15 +60,7 @@ const test = {name: 'Test', ID: 'TestID'}
 /* --------------------------------------------------------------------------- init complete ---- */
 
 journal.once('INIT_COMPLETE', () => {
-    if (journal.location.name !== 'Unknown') {
-        $('#currentSystem')
-            .addClass('charted')
-            .removeClass('highlighted text-center')
-
-        $('#currentSystemName').text(journal.location.name)
-
-        $('#currentSystemIcon').removeClass('hidden')
-    }
+    UI.setCurrentSystem(journal.location)
 
     if (journal.location?.bodies?.length > 0) {
         journal.location.bodies.forEach((body) => {
