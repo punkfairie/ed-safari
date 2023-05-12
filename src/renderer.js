@@ -57,11 +57,9 @@ journal.watchJournal()
 
 const test = {name: 'Test', ID: 'TestID'}
 
-/* --------------------------------------------------------------------------- init complete ---- */
+/* ------------------------------------------------------------------------- build body list ---- */
 
-journal.once('INIT_COMPLETE', () => {
-    UI.setCurrentSystem(journal.location)
-
+journal.once('BUILD_BODY_LIST', () => {
     if (journal.location?.bodies?.length > 0) {
         journal.location.bodies.forEach((body) => {
             const row = UI.createBodyRow(body)
@@ -71,13 +69,21 @@ journal.once('INIT_COMPLETE', () => {
     }
 })
 
+/* ----------------------------------------------------------------- started hyperspace jump ---- */
+
+journal.on('ENTERING_WITCH_SPACE', () => UI.enterWitchSpace())
+
 /* ---------------------------------------------------------------------- entered new system ---- */
 
 journal.on('ENTERED_NEW_SYSTEM', () => {
-    $('#highValueScans').children().remove()
-    $('#lowValueScans').children().remove()
+    UI.setCurrentSystem(journal.location)
 
-    $('#currentSystemName').text(journal.location.name)
+    $(`#${CSS.escape(journal.location.SystemAddress)}`).remove()
+
+    // verify that the internal navRoute matches the UI navRoute, and rebuild it if not
+    if ($('#navRoute').children().length !== journal.navRoute.length) {
+        journal.emit('SET_NAV_ROUTE')
+    }
 })
 
 /* ---------------------------------------------------------------------- body scan detected ---- */
@@ -109,7 +115,7 @@ journal.on('SET_NAV_ROUTE', () => {
     // clear previous nav route, if any
     $('#navRoute').children().remove()
 
-    if (journal.navRoute.length > 1) {
+    if (journal.navRoute.length > 0) {
         journal.navRoute.forEach((system) => {
             // duplicate check
             // CSS.escape is needed since CSS technically doesn't allow numeric IDs

@@ -71,7 +71,7 @@ export class JournalInterface extends EventEmitter {
     // Get current location on setup, so if app is restarted, user can pick up where they left off
     // Rather than waiting til they jump to the next system to use the program again.
     getCurrentLocation(): void {
-        reverseLineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {            
+        reverseLineReader.eachLine(this.currentJournal, (raw: string, last: boolean) => {
             if (raw) { // skip blank line at end of file
                 const line = JSON.parse(raw)
 
@@ -236,6 +236,7 @@ export class JournalInterface extends EventEmitter {
     /* ------------------------------------------------------------------------- getNavRoute ---- */
 
     async getNavRoute(init: boolean = false) {
+        this.navRoute = [] // clear previous route, to catch overwritten routes
         let routeFile: string|null = null
 
         try {
@@ -247,13 +248,26 @@ export class JournalInterface extends EventEmitter {
         if (routeFile) {
             const route: navRoute = JSON.parse(routeFile)
 
+            // system -> skip
+            // CURRENT -> push = true; skip
+            // system -> push
+
+            let push: boolean = false
             route.Route.forEach((system) => {
-                if (system.SystemAddress !== this.location.SystemAddress) {
+                if (!push && system.SystemAddress === this.location.SystemAddress) {
+                    push = true
+                }
+
+                if (push && system.SystemAddress !== this.location.SystemAddress) {
                     this.navRoute.push(new System(system))
                 }
             })
 
-            log('Nav route set.')
+            if (this.navRoute.length > 0) {
+                log('Nav route set.')
+            } else {
+                log('No nav route found.')
+            }
 
             if (init) {
                 this.emit('INIT_COMPLETE')
@@ -268,13 +282,14 @@ export class JournalInterface extends EventEmitter {
     handleFsdJump(line: completeFsdJump): void {
         this.location = new System((line as completeFsdJump))
         log(`FSD Jump detected, current location updated to ${this.location.name}.`)
-        this.emit('ENTERED_NEW_SYSTEM')
 
         if (this.navRoute.length > 0) {
             _.remove(this.navRoute, (system) => {
-                system.SystemAddress === this.location.SystemAddress
+                return system.SystemAddress === this.location.SystemAddress
             })
         }
+
+        this.emit('ENTERED_NEW_SYSTEM')
     }
 
     /* --------------------------------------------------------------------------- parseLine ---- */
@@ -285,6 +300,14 @@ export class JournalInterface extends EventEmitter {
         let DSSFlag: boolean = false
 
         switch (line.event) {
+            // Hyperspace jump started (3.. 2.. 1..)
+            case 'StartJump': {
+                if ('JumpType' in line && line.JumpType === 'Hyperspace') {
+                    this.emit('ENTERING_WITCH_SPACE')
+                }
+                break
+            }
+
             // CMDR jumped to new system, so update current location.
             case 'FSDJump': {
                 this.handleFsdJump((line as completeFsdJump))
@@ -306,13 +329,16 @@ export class JournalInterface extends EventEmitter {
                 break
             }
 
+            // CMDR set a new nav route.
             case 'NavRoute': {
                 this.getNavRoute()
                 break
             }
 
+            // CMDR cleared the nav route.
             case 'NavRouteClear': {
                 this.navRoute = []
+                log('Nav route cleared.')
                 this.emit('SET_NAV_ROUTE')
                 break
             }

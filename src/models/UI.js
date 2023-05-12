@@ -1,9 +1,24 @@
 export class UI {
     constructor() {}
 
+    /* --------------------------------------------------------------------- enterWitchSpace ---- */
+
+    static enterWitchSpace() {
+        $('#highValueScans').children().remove()
+        $('#lowValueScans').children().remove()
+
+        $('#currentSystem').removeClass('charted').addClass('highlighted text-center')
+        $('#currentSystemIcon').addClass('hidden')
+
+        $('#currentSystemName').text('> > > Hyperspace < < <')
+    }
+
     /* -------------------------------------------------------------------- setCurrentSystem ---- */
 
     static setCurrentSystem(system) {
+        $('#highValueScans').children().remove()
+        $('#lowValueScans').children().remove()
+
         if (system.name === 'Unknown') {
             $('#currentSystem').removeClass('charted').addClass('highlighted text-center')
             $('#currentSystemIcon').addClass('hidden')
