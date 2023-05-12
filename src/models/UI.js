@@ -108,7 +108,7 @@ export class UI {
         }
         // type
         const typeName = body.PlanetClass || body.starType || ''
-        type.appendChild($('<span>').text(typeName))
+        type.appendChild($('<span>').text(` ${typeName}`))
         row.appendChild(type)
 
         // distance
