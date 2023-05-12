@@ -2,9 +2,9 @@ import fetch from 'electron-fetch'
 import { Log } from './Log'
 
 class EDSM {
-    constructor() {}
+    private constructor() {}
 
-    static async request(url: string, options: {[index: string]: string}): Promise<object|undefined> {
+    static async request(url: string, options: {[x: string]: string}): Promise<object|undefined> {
         let data: object|undefined = undefined
 
         try {
