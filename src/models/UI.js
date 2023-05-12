@@ -1,6 +1,12 @@
 export class UI {
     constructor() {}
 
+    /* ----------------------------------------------------------------------- #formatNumber ---- */
+
+    static #formatNumber(number) {
+        return Intl.NumberFormat().format(Math.round(number))
+    }
+
     /* --------------------------------------------------------------------- enterWitchSpace ---- */
 
     static enterWitchSpace() {
@@ -18,16 +24,20 @@ export class UI {
     static setCurrentSystem(system) {
         $('#highValueScans').children().remove()
         $('#lowValueScans').children().remove()
+        $('#currentSystem').children().remove()
+
+        let row
 
         if (system.name === 'Unknown') {
-            $('#currentSystem').removeClass('charted').addClass('highlighted text-center')
-            $('#currentSystemIcon').addClass('hidden')
+            row = $('<div>').addClass('row ms-1 me-1')
+            const child = $('<div>').addClass('col system highlighted text-center')
+            child.text(system.name)
+            row.appendChild(child)
         } else {
-            $('#currentSystem').addClass('charted').removeClass('highlighted text-center')
-            $('#currentSystemIcon').removeClass('hidden')
+            row = UI.createSystemRow(system)
         }
 
-        $('#currentSystemName').text(system.name)
+        $('#currentSystem').appendChild(row)
     }
 
     /* -------------------------------------------------------------------------- buildRings ---- */
@@ -103,7 +113,7 @@ export class UI {
 
         // distance
         const distance = $('<div>').addClass(`col-auto ps-2 ms-0 system ${chartedStyle}`)
-        distance.text(body.distance())
+        distance.text(UI.#formatNumber(body.DistanceFromArrivalLS))
         row.appendChild(distance)
 
         // info
@@ -135,8 +145,8 @@ export class UI {
     static createSystemRow(system) {
         const row = $('<div>').addClass('row ms-1 me-1')
         row.attr('id', system.SystemAddress)
-        // TODO APPRAISAL DATA
-        const chartedStyle = 'charted'
+        // This is probably still the default 'true' value, but check in case the fetch() was quick.
+        const chartedStyle = system.charted ? 'charted' : 'uncharted'
 
         // name
         const name = $('<div>').addClass(`col system ${chartedStyle}`)
@@ -145,10 +155,19 @@ export class UI {
         row.appendChild(name)
 
         // mapped value
-        // TODO APPRAISAL DATA
-        const value = $('<div>').addClass(`col-2 text-end system ${chartedStyle}`)
+        // Check if EDSM has responded yet, otherwise value will be filled in later.
+        const value = $('<div>').addClass(`col-2 text-end system ${chartedStyle} value`)
+        if ('estimatedValueMapped' in system) {
+            value.text(UI.#formatNumber(system.estimatedValueMapped))
+        }
         row.appendChild(value)
 
         return row
+    }
+
+    /* ---------------------------------------------------------------------------- setValue ---- */
+
+    static setValue(row, value) {
+        row.children().filter('.value').text(UI.#formatNumber(value))
     }
 }

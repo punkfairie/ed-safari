@@ -2,6 +2,7 @@
     "extends": "@tsconfig/node20/tsconfig.json",
     "compilerOptions": {
         "useUnknownInCatchVariables": false,
+        "lib": ["DOM"]
     },
     "include": ["src"],
     "exclude": ["node_modules"]

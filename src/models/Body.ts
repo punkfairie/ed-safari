@@ -1,10 +1,11 @@
+import type { valuableBody } from "../@types/edsmResponses"
 import type { asteroidScan, autoScan, detailedScan, planetScan, starScan } from "../@types/journalLines"
 
 export interface Body extends starScan<'AutoScan'|'DetailedScan'>, asteroidScan<'AutoScan'|'DetailedScan'>, planetScan<'AutoScan'|'DetailedScan'> {}
 export class Body {
     DSSDone: boolean
 
-    constructor(journalLine: autoScan|detailedScan|null = null, DSS: boolean = false) {
+    constructor(journalLine: autoScan|detailedScan|valuableBody|null = null, DSS: boolean = false) {
         this.DSSDone = DSS
 
         if (journalLine !== null) {
@@ -78,11 +79,5 @@ export class Body {
         }
 
         return typeIcon
-    }
-
-    /* ---------------------------------------------------------------------------- distance ---- */
-
-    distance(): string {
-        return Intl.NumberFormat().format(Math.round(this.DistanceFromArrivalLS))
     }
 }

@@ -35,6 +35,7 @@ import { Safari } from './models/Safari'
 import { UI } from './models/UI'
 import { Body } from './models/Body'
 import { sep } from 'path'
+import { EDSM } from './models/EDSM'
 
 // Grab app.isPackaged from main process
 let isPackaged = false
@@ -48,6 +49,7 @@ window.process.argv.forEach((item) => {
 
 const safari = Safari.start(isPackaged)
 const journal = safari.journal
+const edsm = EDSM.connect()
 
 if (!journal) {
     // handle error
@@ -77,7 +79,7 @@ journal.on('ENTERING_WITCH_SPACE', () => UI.enterWitchSpace())
 journal.on('ENTERED_NEW_SYSTEM', () => {
     UI.setCurrentSystem(journal.location)
 
-    $(`#${CSS.escape(journal.location.SystemAddress)}`).remove()
+    $('#navRoute').children().filter(`#${CSS.escape(journal.location.SystemAddress)}`).remove()
 
     // verify that the internal navRoute matches the UI navRoute, and rebuild it if not
     if ($('#navRoute').children().length !== journal.navRoute.length) {
@@ -125,5 +127,15 @@ journal.on('SET_NAV_ROUTE', () => {
                 $('#navRoute').appendChild(row)
             }
         })
+    }
+})
+
+/* ------------------------------------------------------------------------ system value set ---- */
+
+edsm.on('SYSTEM_APPRAISED', (system) => {
+    const systemRow = $(`#${CSS.escape(system.SystemAddress)}`)
+
+    if (systemRow.length > 0) {
+        UI.setValue(systemRow, system.estimatedValueMapped)
     }
 })

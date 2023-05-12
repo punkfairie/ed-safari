@@ -22,7 +22,7 @@ export class Journal extends EventEmitter {
         super()
 
         this.#path = journalPath
-        this.location = new System('Unknown')
+        this.location = new System()
         this.navRoute = []
 
         // Start ReverseLineReader chain here.
