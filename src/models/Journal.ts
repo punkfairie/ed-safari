@@ -1,13 +1,13 @@
 import type { Tail as TailType } from 'tail'
 import type { autoScan, completeFsdJump, detailedScan, journalEntry, navRoute, planetScan } from "../@types/journalLines"
 
+const EventEmitter = require('node:events')
 import * as _ from 'lodash-es'
 const path = require('node:path')
 const { readFile } = require('node:fs/promises')
 const reverseLineReader = require('reverse-line-reader')
 const Tail = require('tail').Tail
 
-import EventEmitter from "events"
 import { System } from "./System"
 import { Log } from "./Log"
 import { Body } from "./Body"
@@ -176,7 +176,7 @@ export class Journal extends EventEmitter {
         let routeFile: string|null = null
 
         try {
-            const filePath: string = path.dirname(this.#path) + 'NavRoute.json'
+            const filePath: string = path.dirname(this.#path) + '/NavRoute.json'
             routeFile = await readFile(filePath, {encoding: 'utf8'})
         } catch (err) {
             Log.write(`Error reading nav route file: ${err.message}.`)

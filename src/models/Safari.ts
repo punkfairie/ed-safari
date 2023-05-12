@@ -8,7 +8,7 @@ const path = require('node:path')
 import { Journal } from "./Journal"
 import { Log } from "./Log"
 
-export class App {
+export class Safari {
     #journalDir?: string
     #journalPattern?: string
     journal?: Journal
@@ -49,10 +49,10 @@ export class App {
     /* --------------------------------------------------------------------- watchJournalDir ---- */
 
     watchJournalDir(): void {
-        const watcher = chokidar.watch(this.#journalPattern, {usePolling: true, persistant: true})
-
+        const options = {usePolling: true, persistent: true, ignoreInitial: true}
+        const watcher = chokidar.watch(this.#journalPattern, options)
+        
+        watcher.on('ready', () => Log.write('Watching journal folder for changes...'))
         watcher.on('add', () => this.journal = this.#getLatestJournal())
-
-        Log.write('Watching journal folder for changes...')
     }
 }

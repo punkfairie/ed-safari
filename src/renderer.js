@@ -31,7 +31,7 @@ import './assets/index.css'
 import './icons/flaticon.css'
 
 const { app } = require('electron')
-import { JournalInterface } from './interfaces/JournalInterface'
+import { Safari } from './models/Safari'
 import { UI } from './models/UI'
 import { Body } from './models/Body'
 import { sep } from 'path'
@@ -46,16 +46,15 @@ window.process.argv.forEach((item) => {
 
 /* ------------------------------------------------------------------------------- app setup ---- */
 
-const journal = new JournalInterface(isPackaged)
+const safari = new Safari(isPackaged)
+const journal = safari.journal
 
-if (journal.journalDir === null) {
+if (!journal) {
     // handle error
 }
 
-journal.watchDirectory()
-journal.watchJournal()
-
-const test = {name: 'Test', ID: 'TestID'}
+safari.watchJournalDir()
+journal.watch()
 
 /* ------------------------------------------------------------------------- build body list ---- */
 
