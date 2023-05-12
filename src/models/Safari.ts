@@ -9,11 +9,12 @@ import { Journal } from "./Journal"
 import { Log } from "./Log"
 
 export class Safari {
+    static #instance: Safari
     #journalDir?: string
     #journalPattern?: string
     journal?: Journal
 
-    constructor(isPackaged: boolean) {
+    private constructor(isPackaged: boolean) {
         if (!isPackaged) { // Account for WSL during development
             this.#journalDir = "/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/"
         } else if (os.platform() === 'win32') { // Windows
@@ -28,6 +29,14 @@ export class Safari {
             this.#journalPattern = this.#journalDir + "Journal.*.log"
             this.journal = this.#getLatestJournal()
         }
+    }
+
+    static start(isPackaged: boolean): Safari {
+        if (!Safari.#instance) {
+            Safari.#instance = new Safari(isPackaged)
+        }
+
+        return Safari.#instance
     }
 
     /* ------------------------------------------------------------------- #getLatestJournal ---- */

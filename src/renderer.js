@@ -46,7 +46,7 @@ window.process.argv.forEach((item) => {
 
 /* ------------------------------------------------------------------------------- app setup ---- */
 
-const safari = new Safari(isPackaged)
+const safari = Safari.start(isPackaged)
 const journal = safari.journal
 
 if (!journal) {
