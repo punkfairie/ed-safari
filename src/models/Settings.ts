@@ -44,7 +44,7 @@ export class Settings {
         this.maxDistance = contents.maxDistance;
     }
 
-    static get(isPackaged: boolean): Settings {
+    static get(isPackaged: boolean = false): Settings {
         if (!Settings.#instance) {
             Settings.#instance = new Settings(isPackaged);
         }
