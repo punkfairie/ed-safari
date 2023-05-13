@@ -44,11 +44,24 @@ const closeWindow = (event) => {
     window?.close();
 }
 
+// Set up settings page handler.
+const loadSettings = (event) => {
+    const webContents = event.sender;
+    const window = BrowserWindow.fromWebContents(webContents);
+
+    if (SETTINGS_WINDOW_VITE_DEV_SERVER_URL) {
+        window.loadURL(`${SETTINGS_WINDOW_VITE_DEV_SERVER_URL}/settings.html`);
+    } else {
+        window.loadFile(path.join(__dirname, `../renderer/${SETTINGS_WINDOW_VITE_NAME}/settings.html`));
+    }
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
     ipcMain.on('CLOSE_WINDOW', closeWindow);
+    ipcMain.on('LOAD_SETTINGS', loadSettings);
     createWindow();
 });
 
@@ -71,61 +84,3 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
-
-// const openSettings = async () => {
-//     settingsWindow = new BrowserWindow({
-//         width: 800,
-//         height: 600,
-//         parent: mainWindow,
-//         modal: true,
-//         show: false,
-//         webPreferences: {
-//             nodeIntegration: true,
-//             contextIsolation: false,
-//             additionalArguments: [`EDS-ENV=${app.isPackaged}`],
-//         },
-//     });
-
-//     if (SETTINGS_WINDOW_VITE_DEV_SERVER_URL) {
-//         settingsWindow.loadURL(`${SETTINGS_WINDOW_VITE_DEV_SERVER_URL}/settings.html`);
-//     } else {
-//         settingsWindow.loadFile(path.join(__dirname, `../renderer/${SETTINGS_WINDOW_VITE_NAME}/settings.html`));
-//     }
-
-//     // Open the DevTools.
-//     if (!app.isPackaged) {
-//         settingsWindow.webContents.openDevTools();
-//     }
-
-//     settingsWindow.show();
-
-//     // Make sure window is destroyed on close, or else it won't open again.
-//     settingsWindow.on('closed', () => {
-//         settingsWindow = undefined;
-//     });
-// }
-
-// const menuTemplate = [
-//     {
-//         label: 'File',
-//         submenu: [
-//             { label: 'Settings', click: async () => { openSettings(); } },
-//             { role: 'quit' }
-//         ]
-//     },
-//     {
-//         role: 'help',
-//         submenu: [
-//             {
-//                 label: 'Github',
-//                 click: async () => {
-//                     const { shell } = require('electron');
-//                     await shell.openExternal('https://github.com/punkfairie/ed-safari');
-//                 }
-//             }
-//         ]
-//     }
-// ]
-
-// const menu = Menu.buildFromTemplate(menuTemplate)
-// Menu.setApplicationMenu(menu)

@@ -66,6 +66,12 @@ $('#closeBtn').on('click', () => {
     ipcRenderer.send('CLOSE_WINDOW')
 })
 
+/* ----------------------------------------------------------------- settings button handler ---- */
+
+$('#settingsBtn').on('click', () => {
+    ipcRenderer.send('LOAD_SETTINGS')
+})
+
 /* ------------------------------------------------------------------------- build body list ---- */
 
 journal.once('BUILD_BODY_LIST', () => {

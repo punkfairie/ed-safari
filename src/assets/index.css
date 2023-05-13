@@ -19,6 +19,8 @@
 
     --grey-text: #9f9f9f;
     --grey-bg: #333333;
+
+    --shadow: 0 0 3px;
 }
 
 body {
@@ -39,7 +41,7 @@ body {
     margin-top: 1px;
     margin-bottom: 1px;
     padding-left: 10px;
-    text-shadow: 0px 0px 3px;
+    text-shadow: var(--shadow);
     margin-left: 1px;
     margin-right: 1px;
 }
@@ -124,7 +126,7 @@ div b.active.landable {
     color: var(--main);
     border-color: var(--main);
     border-width: 1px 0px 1px 0px;
-    text-shadow: 0px 0px 3px;
+    text-shadow: var(--shadow);
     opacity: 100%;
 }
 
@@ -184,9 +186,18 @@ div b.active.landable {
     user-select: none;
 }
 
+#titlebar .title {
+    color: var(--grey-text);
+    text-shadow: var(--shadow);
+}
+
 #titlebar .btn-close {
     -webkit-app-region: no-drag;
-    filter: drop-shadow(0 0px 3px var(--grey-text)) var(--bs-btn-close-white-filter);
+    filter: drop-shadow(var(--shadow) var(--grey-text)) var(--bs-btn-close-white-filter);
     width: 0.4em;
     height: 0.4em;
+}
+
+#titlebar .btn-settings {
+    background: transparent url('./../icons/gear.svg') center/1em auto no-repeat;
 }
