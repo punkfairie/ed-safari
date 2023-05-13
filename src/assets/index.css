@@ -173,11 +173,16 @@ div b.active.landable {
     border-color: transparent;
     border-radius: 0;
     box-shadow: none;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    font-style: inherit;
+    text-shadow: inherit;
+    text-align: center;
 }
 
-/* SET THIS TO PARENT VIA CSS */
 .form-control:focus {
-    border-color: var(--main);
+    border-bottom: 1px solid var(--main);
 }
 
 .draggable {
