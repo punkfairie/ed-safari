@@ -35,6 +35,7 @@ import './assets/ldom.min'
 const { app, ipcRenderer } = require('electron')
 
 import { Safari } from './models/Safari'
+import { Settings } from './models/Settings'
 import { UI } from './models/UI'
 import { Body } from './models/Body'
 import { EDSM } from './models/EDSM'
@@ -50,6 +51,7 @@ window.process.argv.forEach((item) => {
 /* ------------------------------------------------------------------------------- app setup ---- */
 
 const safari = Safari.start(isPackaged)
+const settings = Settings.get(isPackaged)
 const journal = safari.journal
 const edsm = EDSM.connect()
 
