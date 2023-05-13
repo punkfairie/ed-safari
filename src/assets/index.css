@@ -205,3 +205,18 @@ div b.active.landable {
 #titlebar .btn-back {
     background: transparent url('./../icons/arrow-left.svg') center/1em auto no-repeat;
 }
+
+.separator .btn {
+    color: var(--main);
+    text-transform: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    text-shadow: inherit;
+    transition: color 300ms;
+    border-radius: 0;
+}
+
+.separator .btn:hover {
+    color: var(--accent-light);
+    transition: color 300ms;
+}

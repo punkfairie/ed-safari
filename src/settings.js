@@ -13,6 +13,6 @@ $('#closeBtn').on('click', () => {
 
 /* ---------------------------------------------------------------- load main window handler ---- */
 
-$('#backBtn').on('click', () => {
+$('.backBtn').on('click', () => {
     ipcRenderer.send('LOAD_MAIN')
 })
