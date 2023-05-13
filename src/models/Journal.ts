@@ -15,6 +15,7 @@ import { Body } from "./Body"
 
 export class Journal extends EventEmitter {
     #path: string
+    testing: string
     location: System
     navRoute: System[]
 
@@ -30,6 +31,8 @@ export class Journal extends EventEmitter {
         this.#getLastFsdJump()
         // -> IF no FSD Jump: this.#getLastLocation()
         // --> this.#getScannedBodies()
+
+        this.testing = this.#path
     }
 
     /* --------------------------------------------------------------------- #getLastFsdJump ---- */

@@ -15,10 +15,10 @@ export class Safari {
     journal?: Journal
 
     private constructor(isPackaged: boolean) {
-        if (!isPackaged) { // Account for WSL during development
+        if (!isPackaged && os.platform() === 'linux') { // Account for WSL during development
             this.#journalDir = "/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/"
         } else if (os.platform() === 'win32') { // Windows
-            this.#journalDir = os.homedir() + '\\Saved Games\\Frontier Developments\\Elite Dangerous'
+            this.#journalDir = os.homedir() + '\\Saved Games\\Frontier Developments\\Elite Dangerous\\'
         } else if (os.platform() === 'linux') { // Linux
             this.#journalDir = os.homedir() + '/.local/share/Steam/steamapps/compatdata/359320/pfx/drive_c/users/steamuser/Saved Games/Frontier Developments/Elite Dangerous/'
         } else {
@@ -43,7 +43,7 @@ export class Safari {
 
     // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
     #getLatestJournal(): Journal|undefined {
-        const journals = globSync(this.#journalPattern)
+        const journals = globSync(this.#journalPattern, {windowsPathsNoEscape: true})
         const journalPath: string|undefined = _.maxBy(journals, file => fs.statSync(file).mtime)
 
         if (journalPath) {

@@ -21,7 +21,7 @@ export class UI {
     /* -------------------------------------------------------------------- setCurrentSystem ---- */
 
     static setCurrentSystem(system) {
-        $('#acans').children().remove()
+        $('#scans').children().remove()
         $('#currentSystem').children().remove()
 
         let row

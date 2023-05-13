@@ -30,6 +30,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 import './assets/index.css'
 import './icons/flaticon.css'
 
+import './assets/ldom.dev'
+
 const { app } = require('electron')
 import { Safari } from './models/Safari'
 import { UI } from './models/UI'
