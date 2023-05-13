@@ -6,11 +6,12 @@ if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
+let mainWindow;
 let settingsWindow;
 
 const createWindow = () => {
     // Create the browser window.
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         width: 1000,
         height: 800,
         webPreferences: {
@@ -20,32 +21,18 @@ const createWindow = () => {
             additionalArguments: [`EDS-ENV=${app.isPackaged}`],
         },
     });
-    
+
     // and load the index.html of the app.
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
         mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     } else {
         mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
     }
-    
+
     // Open the DevTools.
     if (!app.isPackaged) {
         mainWindow.webContents.openDevTools();
     }
-    
-    // Create the settings window that we can use later.
-    settingsWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
-        parent: mainWindow,
-        modal: true,
-        show: false,
-        webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-            additionalArguments: [`EDS-ENV=${app.isPackaged}`],
-        },
-    });
 };
 
 // This method will be called when Electron has finished
@@ -74,13 +61,36 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 const openSettings = async () => {
+    settingsWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        parent: mainWindow,
+        modal: true,
+        show: false,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: false,
+            additionalArguments: [`EDS-ENV=${app.isPackaged}`],
+        },
+    });
+
     if (SETTINGS_WINDOW_VITE_DEV_SERVER_URL) {
         settingsWindow.loadURL(`${SETTINGS_WINDOW_VITE_DEV_SERVER_URL}/settings.html`);
     } else {
         settingsWindow.loadFile(path.join(__dirname, `../renderer/${SETTINGS_WINDOW_VITE_NAME}/settings.html`));
     }
 
-    settingsWindow.show()
+    // Open the DevTools.
+    if (!app.isPackaged) {
+        settingsWindow.webContents.openDevTools();
+    }
+
+    settingsWindow.show();
+
+    // Make sure window is destroyed on close, or else it won't open again.
+    settingsWindow.on('closed', () => {
+        settingsWindow = undefined;
+    });
 }
 
 const menuTemplate = [
