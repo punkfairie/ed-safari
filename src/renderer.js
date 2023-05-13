@@ -32,7 +32,7 @@ import './icons/flaticon.css'
 
 import './assets/ldom.min'
 
-const { app } = require('electron')
+const { app, ipcRenderer } = require('electron')
 import { Safari } from './models/Safari'
 import { UI } from './models/UI'
 import { Body } from './models/Body'
@@ -59,6 +59,12 @@ if (!journal) {
 
 safari.watchJournalDir()
 journal.watch()
+
+/* -------------------------------------------------------------------- close window handler ---- */
+
+$('#closeBtn').on('click', () => {
+    ipcRenderer.send('CLOSE_WINDOW')
+})
 
 /* ------------------------------------------------------------------------- build body list ---- */
 
