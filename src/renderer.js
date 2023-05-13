@@ -66,8 +66,8 @@ journal.once('BUILD_BODY_LIST', () => {
 
         journal.location.bodies.forEach((body) => {
             const row = UI.createBodyRow(body)
-            // TODO APPRAISAL DATA
-            $('#lowValueScans').appendChild(row)
+
+            $('#scans').appendChild(row)
         })
     }
 })
@@ -103,14 +103,12 @@ journal.on('BODY_SCANNED', (body, DSS) => {
             bodyRow.removeClass('highlighted uncharted').addClass('charted')
         } else {
             const row = UI.createBodyRow(body)
-            // TODO APPRAISAL DATA
-            $('#lowValueScans').appendChild(row)
+            $('#scans').appendChild(row)
         }
 
     } else { // else it's an FSS/auto scan and won't be in the list yet
         const row = UI.createBodyRow(body)
-        // TODO APPRAISAL DATA
-        $('#lowValueScans').appendChild(row)
+        $('#scans').appendChild(row)
     }
 })
 

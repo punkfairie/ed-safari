@@ -71,7 +71,7 @@ export class System {
 
     /* -------------------------------------------------------------------------- sortBodies ---- */
 
-    sortBodies() {
+    sortBodies(): void {
         this.bodies = _.orderBy(this.bodies, ['mappedValue'], ['desc'])
     }
 }

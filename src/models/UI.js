@@ -10,8 +10,7 @@ export class UI {
     /* --------------------------------------------------------------------- enterWitchSpace ---- */
 
     static enterWitchSpace() {
-        $('#highValueScans').children().remove()
-        $('#lowValueScans').children().remove()
+        $('#scans').children().remove()
 
         $('#currentSystem').removeClass('charted').addClass('highlighted text-center')
         $('#currentSystemIcon').addClass('hidden')
@@ -22,8 +21,7 @@ export class UI {
     /* -------------------------------------------------------------------- setCurrentSystem ---- */
 
     static setCurrentSystem(system) {
-        $('#highValueScans').children().remove()
-        $('#lowValueScans').children().remove()
+        $('#acans').children().remove()
         $('#currentSystem').children().remove()
 
         let row
@@ -87,6 +85,7 @@ export class UI {
 
     static createBodyRow(body) {
         const chartedStyle = body.WasDiscovered && !body.DSSDone ? 'charted' : 'uncharted'
+        // TODO USER SETTINGS
         const valuableStyle = body.mappedValue > 2000 ? 'highlighted' : ''
 
         const row = $('<div>').addClass('row ms-1 me-1')
