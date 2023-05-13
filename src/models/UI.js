@@ -133,8 +133,8 @@ export class UI {
         row.appendChild(info)
 
         // mapped value
-        // TODO APPRAISAL DATA
         const value = $('<div>').addClass(`col-2 text-end system ${chartedStyle}`)
+        value.text(UI.#formatNumber(body.mappedValue))
         row.appendChild(value)
 
         return row
