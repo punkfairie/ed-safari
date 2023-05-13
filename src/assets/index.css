@@ -201,3 +201,7 @@ div b.active.landable {
 #titlebar .btn-settings {
     background: transparent url('./../icons/gear.svg') center/1em auto no-repeat;
 }
+
+#titlebar .btn-back {
+    background: transparent url('./../icons/arrow-left.svg') center/1em auto no-repeat;
+}

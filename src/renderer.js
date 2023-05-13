@@ -33,10 +33,10 @@ import './icons/flaticon.css'
 import './assets/ldom.min'
 
 const { app, ipcRenderer } = require('electron')
+
 import { Safari } from './models/Safari'
 import { UI } from './models/UI'
 import { Body } from './models/Body'
-import { sep } from 'path'
 import { EDSM } from './models/EDSM'
 
 // Grab app.isPackaged from main process
