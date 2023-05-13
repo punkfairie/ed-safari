@@ -87,6 +87,8 @@ export class UI {
 
     static createBodyRow(body) {
         const chartedStyle = body.WasDiscovered && !body.DSSDone ? 'charted' : 'uncharted'
+        const valuableStyle = body.mappedValue > 2000 ? 'highlighted' : ''
+
         const row = $('<div>').addClass('row ms-1 me-1')
         row.attr('id', body.bodyID)
 
@@ -94,13 +96,13 @@ export class UI {
         row.appendChild($('<div>').addClass('col-1 system'))
 
         // name
-        const name = $('<div>').addClass(`col-2 text-start system ${chartedStyle}`)
+        const name = $('<div>').addClass(`col-2 text-start system ${chartedStyle} ${valuableStyle}`)
         name.appendChild($('<i>')).addClass(`flaticon-${body.nameIcon()}`)
         name.appendChild($('<span>')).text(body.simpleName())
         row.appendChild(name)
 
         // type icon
-        const type = $('<div>').addClass(`col pe-0 me-0 system ${chartedStyle}`)
+        const type = $('<div>').addClass(`col pe-0 me-0 system ${chartedStyle} ${valuableStyle}`)
         type.appendChild($('<i>').addClass(`flaticon-${body.typeIcon()}`))
         // rings
         if (body.Rings !== undefined) {
@@ -112,12 +114,13 @@ export class UI {
         row.appendChild(type)
 
         // distance
-        const distance = $('<div>').addClass(`col-auto ps-2 ms-0 system ${chartedStyle}`)
+        const distance = $('<div>')
+        distance.addClass(`col-auto ps-2 ms-0 system ${chartedStyle} ${valuableStyle}`)
         distance.text(UI.#formatNumber(body.DistanceFromArrivalLS))
         row.appendChild(distance)
 
         // info
-        const info = $('<div>').addClass(`col-1 system ${chartedStyle}`)
+        const info = $('<div>').addClass(`col-1 system ${chartedStyle} ${valuableStyle}`)
         // terraformable
         const terraform = $('<i>').addClass('flaticon-cooling-tower opacity-0')
         if (body.isPlanet && body.TerraformState) {
@@ -125,7 +128,8 @@ export class UI {
         }
         info.appendChild(terraform)
         // was mapped
-        const mapped = $('<i>').addClass('flaticon-flag-outline-on-a-pole-with-stars-around opacity-0')
+        const mapped = $('<i>')
+        mapped.addClass('flaticon-flag-outline-on-a-pole-with-stars-around opacity-0')
         if (body.isPlanet() && !body.WasMapped) {
             mapped.removeClass('opacity-0')
         }
@@ -133,7 +137,7 @@ export class UI {
         row.appendChild(info)
 
         // mapped value
-        const value = $('<div>').addClass(`col-2 text-end system ${chartedStyle}`)
+        const value = $('<div>').addClass(`col-2 text-end system ${chartedStyle} ${valuableStyle}`)
         value.text(UI.#formatNumber(body.mappedValue))
         row.appendChild(value)
 

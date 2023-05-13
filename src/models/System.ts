@@ -1,4 +1,7 @@
 import type { completeFsdJump, location, navRouteSystem } from "../@types/journalLines"
+
+import * as _ from 'lodash-es'
+
 import { Body } from "./Body"
 import { EDSM } from "./EDSM"
 
@@ -64,5 +67,11 @@ export class System {
             // Let the UI know it needs to update.
             EDSM.connect().emit('SYSTEM_APPRAISED', this)
         }
+    }
+
+    /* -------------------------------------------------------------------------- sortBodies ---- */
+
+    sortBodies() {
+        this.bodies = _.orderBy(this.bodies, ['mappedValue'], ['desc'])
     }
 }

@@ -62,6 +62,8 @@ journal.watch()
 
 journal.once('BUILD_BODY_LIST', () => {
     if (journal.location?.bodies?.length > 0) {
+        journal.location.sortBodies()
+
         journal.location.bodies.forEach((body) => {
             const row = UI.createBodyRow(body)
             // TODO APPRAISAL DATA
@@ -90,6 +92,8 @@ journal.on('ENTERED_NEW_SYSTEM', () => {
 /* ---------------------------------------------------------------------- body scan detected ---- */
 
 journal.on('BODY_SCANNED', (body, DSS) => {
+    journal.location.sortBodies()
+
     // If this is a DSS scan, it's very likely that the body already exists in our list so we just
     // need to remove the highlighting if applicable
     if (DSS) {
