@@ -4,9 +4,17 @@
     <meta charset="UTF-8">
     <title>ED Safari v0.0.1</title>
 </head>
-<body>
+<body data-bs-theme="dark">
+    <div id="titlebar" class="draggable container-fluid mt-2">
+        <div class="row justify-content-end">
+            <div class="col-auto">
+                <button type="button" class="btn-close" onclick="closeApp()"></button>
+            </div>
+        </div>
+    </div>
+
     <!-- CURRENT LOCATION -->
-    <div class="container-fluid">
+    <div class="container-fluid draggable">
         <div class="row separator align-items-center">
             <div class="col"><hr class="separator"></div>
             <div class="col-auto">Current Location</div>

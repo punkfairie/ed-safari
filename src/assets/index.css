@@ -177,3 +177,16 @@ div b.active.landable {
 .form-control:focus {
     border-color: var(--main);
 }
+
+.draggable {
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#titlebar .btn-close {
+    -webkit-app-region: no-drag;
+    filter: drop-shadow(0 0px 3px var(--grey-text)) var(--bs-btn-close-white-filter);
+    width: 0.4em;
+    height: 0.4em;
+}
