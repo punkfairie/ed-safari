@@ -98,7 +98,7 @@ div.charted b.inactive {
 }
 
 .highlighted {
-    color: var(--secondary-dark);
+    color: var(--background);
     background: var(--main);
 }
 

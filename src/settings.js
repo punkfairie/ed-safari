@@ -5,11 +5,22 @@ import './assets/ldom.min';
 
 const { ipcRenderer } = require('electron');
 const { setTimeout } = require('node:timers/promises');
+const { basename } = require('node:path');
 
 import { Settings } from './models/Settings';
 import { UI } from './models/UI';
 
 const settings = Settings.get();
+
+if (settings.matrix) {
+    UI.setColors(settings.matrix);
+}
+
+/* ------------------------------------------------------------------------------ set colors ---- */
+
+settings.on('CUSTOM_COLORS_SET', () => {
+    UI.setColors(settings.matrix);
+});
 
 /* -------------------------------------------------------------------- close window handler ---- */
 
@@ -59,6 +70,11 @@ $('form').on('submit', async function (event) {
     if (isNaN(data.maxDistance)) {
         UI.addFormError('#maxDistance', 'Please enter a number!');
         errors = true;
+    }
+
+    const fileName = basename(data.matrixFile);
+    if (fileName !== 'XML-Profile.ini' || fileName !== 'GraphicsConfiguration.xml') {
+        UI.addFormError('#matrixFile', 'Invalid file.');
     }
 
     // TODO re-enable submit button if errors.

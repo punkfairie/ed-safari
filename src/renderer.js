@@ -35,6 +35,12 @@ if (!journal) {
 safari.watchJournalDir();
 journal.watch();
 
+/* ------------------------------------------------------------------------------ set colors ---- */
+
+settings.on('CUSTOM_COLORS_SET', () => {
+    UI.setColors(settings.matrix);
+});
+
 /* -------------------------------------------------------------------- close window handler ---- */
 
 $('#closeBtn').on('click', () => {
@@ -130,17 +136,3 @@ edsm.on('SYSTEM_APPRAISED', (system) => {
         UI.setValue(systemRow, system.estimatedValueMapped);
     }
 });
-
-// const matrixRed = [1.2, 0.05, 0.07];
-// const matrixGreen = [0.13, 1, 1.18];
-// const matrixBlue = [0.4, 1.29, 2];
-
-// const matrix = new EliteMatrix(matrixRed, matrixGreen, matrixBlue);
-// const hex = matrix.filterColor('#f5a804');
-// const rgb = matrix.filterColor([245, 168, 4]);
-// console.log(`rgb(${rgb})`)
-// $('body').css('--main', `rgb(${rgb})`);
-// $('body').css('--accent-dark', matrix.filterColor('#000e5f'));
-// $('body').css('--accent-light', matrix.filterColor('#17cbd4'));
-// $('body').css('--secondary-light', matrix.filterColor('#EAA529'));
-// $('body').css('--secondary-dark', matrix.filterColor('#370C03'));

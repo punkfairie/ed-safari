@@ -9,6 +9,17 @@ export class UI {
         return Intl.NumberFormat().format(Math.round(number));
     }
 
+    /* --------------------------------------------------------------------------- setColors ---- */
+
+    static setColors(matrix) {
+        const body = $('body');
+        body.css('--main', matrix.filterColor('#F5A804'));
+        body.css('--accent-dark', matrix.filterColor('#000e5f'));
+        body.css('--accent-light', matrix.filterColor('#17cbd4'));
+        body.css('--secondary-light', matrix.filterColor('#EAA529'));
+        body.css('--secondary-dark', matrix.filterColor('#370C03'));
+    }
+
     /* --------------------------------------------------------------------- enterWitchSpace ---- */
 
     static enterWitchSpace() {

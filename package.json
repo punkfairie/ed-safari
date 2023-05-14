@@ -45,8 +45,10 @@
     "electron-squirrel-startup": "^1.0.0",
     "elite-matrix": "^1.0.0",
     "glob": "^10.2.2",
+    "ini": "^4.1.0",
     "lodash-es": "^4.17.21",
     "reverse-line-reader": "^0.2.6",
-    "tail": "^2.2.6"
+    "tail": "^2.2.6",
+    "xml-js": "^1.6.11"
   }
 }
