@@ -183,4 +183,13 @@ export class UI {
     static setValue(row, value) {
         row.children().filter('.value').text(UI.#formatNumber(value));
     }
+
+    /* ------------------------------------------------------------------------ addFormError ---- */
+
+    static addFormError(field, msg) {
+        const label = $(field).parent().parent().children().filter('label');
+        const error = $('<span>').addClass('form-error');
+        error.text(msg);
+        label.appendChild(error);
+    }
 }

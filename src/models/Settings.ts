@@ -1,7 +1,9 @@
-const fs = require('node:fs/promises')
-const { statSync, writeFileSync, readFileSync } = require('node:fs')
-const os = require('node:os')
-const path = require('node:path')
+const fs = require('node:fs/promises');
+const { statSync, writeFileSync, readFileSync } = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+
+import { Log } from "./Log";
 
 interface settingsFile {
     minValue: number,
@@ -12,6 +14,7 @@ export class Settings {
     static #instance: Settings;
 
     #file: string;
+    #writing: boolean;
 
     minValue: number;
     maxDistance: number;
@@ -42,6 +45,8 @@ export class Settings {
         const contents: settingsFile = JSON.parse(readFileSync(this.#file, { encoding: 'utf8' }));
         this.minValue = contents.minValue;
         this.maxDistance = contents.maxDistance;
+
+        this.#writing = false;
     }
 
     static get(isPackaged: boolean = false): Settings {
@@ -50,5 +55,25 @@ export class Settings {
         }
 
         return Settings.#instance;
+    }
+
+    /* -------------------------------------------------------------------------------- save ---- */
+
+    async save(settings: settingsFile): Promise<boolean> {
+        if (!this.#writing) {
+            try {
+                // So we don't try to write again before this one finishes.
+                this.#writing = true;
+                await fs.writeFile(this.#file, JSON.stringify(settings));
+                this.#writing = false;
+
+                return true;
+            } catch (err) {
+                Log.write(err);
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

@@ -225,3 +225,8 @@ div b.active.landable {
     color: var(--accent-light);
     transition: color 300ms;
 }
+
+.form-error {
+    color: var(--main);
+    margin-left: 1rem;
+}
