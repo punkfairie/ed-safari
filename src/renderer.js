@@ -5,13 +5,13 @@ import './icons/flaticon.css';
 import './assets/ldom.min';
 
 const { app, ipcRenderer } = require('electron');
+import { EliteMatrix } from 'elite-matrix';
 
 import { Safari } from './models/Safari';
 import { Settings } from './models/Settings';
 import { UI } from './models/UI';
 import { Body } from './models/Body';
 import { EDSM } from './models/EDSM';
-import { blend } from './assets/blend';
 
 // Grab app.isPackaged from main process
 let isPackaged = false;
@@ -131,6 +131,17 @@ edsm.on('SYSTEM_APPRAISED', (system) => {
     }
 });
 
-// const color = blend([245, 168, 4], [0, 0, 0], [0.4, 0.6]);
-// const rgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-// $('body').css('--secondary-dark', rgb);
+
+// const matrixRed = [1.2, 0.05, 0.07];
+// const matrixGreen = [0.13, 1, 1.18];
+// const matrixBlue = [0.4, 1.29, 2];
+
+// const matrix = new EliteMatrix(matrixRed, matrixGreen, matrixBlue);
+// const hex = matrix.filterColor('#f5a804');
+// const rgb = matrix.filterColor([245, 168, 4]);
+// console.log(`rgb(${rgb})`)
+// $('body').css('--main', `rgb(${rgb})`);
+// $('body').css('--accent-dark', matrix.filterColor('#000e5f'));
+// $('body').css('--accent-light', matrix.filterColor('#17cbd4'));
+// $('body').css('--secondary-light', matrix.filterColor('#EAA529'));
+// $('body').css('--secondary-dark', matrix.filterColor('#370C03'));
