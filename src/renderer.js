@@ -131,7 +131,6 @@ edsm.on('SYSTEM_APPRAISED', (system) => {
     }
 });
 
-
 // const matrixRed = [1.2, 0.05, 0.07];
 // const matrixGreen = [0.13, 1, 1.18];
 // const matrixBlue = [0.4, 1.29, 2];

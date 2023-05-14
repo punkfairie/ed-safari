@@ -3,6 +3,7 @@ const { statSync, writeFileSync, readFileSync } = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
+import { EliteMatrix } from "elite-matrix";
 import { Log } from "./Log";
 
 interface settingsFile {
@@ -18,6 +19,9 @@ export class Settings {
 
     minValue: number;
     maxDistance: number;
+
+    #matrixFile?: string;
+    matrix?: EliteMatrix;
 
     private constructor(isPackaged: boolean) {
         if (!isPackaged && os.platform() === 'linux') {

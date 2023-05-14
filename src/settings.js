@@ -28,6 +28,13 @@ $('.backBtn').on('click', () => {
 $('#minValue').attr('value', settings.minValue);
 $('#maxDistance').attr('value', settings.maxDistance);
 
+/* ---------------------------------------------------------------------- select matrix file ---- */
+
+$('#matrixBtn').on('click', async function () {
+    const filePath = await ipcRenderer.invoke('SELECT_MATRIX_FILE');
+    $('#matrixFile').attr('value', filePath);
+});
+
 /* ---------------------------------------------------------------------------- process form ---- */
 
 $('form').on('submit', async function (event) {

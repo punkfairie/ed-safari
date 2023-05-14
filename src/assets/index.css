@@ -185,6 +185,21 @@ div b.active.landable {
     border-bottom: 1px solid var(--main);
 }
 
+form .btn {
+    color: inherit;
+    text-transform: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    text-shadow: inherit;
+    border-radius: 0;
+    transition: color 400ms;
+}
+
+form .btn:hover {
+    color: var(--main);
+    transition: color 400ms;
+}
+
 .draggable {
     -webkit-app-region: drag;
     -webkit-user-select: none;

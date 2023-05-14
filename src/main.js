@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog } = require('electron');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -7,7 +7,6 @@ if (require('electron-squirrel-startup')) {
 }
 
 let mainWindow;
-let settingsWindow;
 
 const createWindow = () => {
     // Create the browser window.
@@ -68,6 +67,21 @@ const loadMain = (event) => {
     }
 }
 
+// Set up file picker handler.
+const selectMatrixFile = async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog(mainWindow, {
+        filters: [{name: 'Matrix File', extensions: ['xml', 'ini']}],
+        properties: ['openFile', 'showHiddenFiles'],
+    });
+
+    if (canceled) {
+        return;
+    } else {
+        return filePaths[0];
+    }
+
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -75,6 +89,7 @@ app.on('ready', () => {
     ipcMain.on('CLOSE_WINDOW', closeWindow);
     ipcMain.on('LOAD_SETTINGS', loadSettings);
     ipcMain.on('LOAD_MAIN', loadMain);
+    ipcMain.handle('SELECT_MATRIX_FILE', selectMatrixFile);
     createWindow();
 });
 

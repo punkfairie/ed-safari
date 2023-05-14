@@ -48,21 +48,9 @@
                 <div class="col col-form-label system charted">
                     Where to get RGB matrix:
                 </div>
-                <div class="col-auto system charted p-0">
-                    <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" name="matrixSource" id="matrixSourceDefault" value="default" checked>
-                        <label for="matrixSourceDefault" class="form-check-label">
-                            GraphicsConfiguration.xml
-                        </label>
-                    </div>
-                </div>
-                <div class="col-auto system charted p-0">
-                    <div class="form-check form-check-inline">
-                        <input type="radio" class="form-check-input" id="matrixSourceEDHM" name="matrixSource" value="EDHM">
-                        <label for="matrixSourceEDHM" class="form-check-label">
-                            EDHM XML-Profile.ini
-                        </label>
-                    </div>
+                <div class="col-2 system charted p-0 text-center">
+                    <button type="button" class="btn" id="matrixBtn">Select File</button>
+                    <input type="hidden" id="matrixFile" name="matrixFile">
                 </div>
             </div>
         </div>
