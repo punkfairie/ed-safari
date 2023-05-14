@@ -62,11 +62,14 @@ export class Settings {
     async save(settings: settingsFile): Promise<boolean> {
         if (!this.#writing) {
             try {
+                Log.write('Attempting to save changed settings...');
+
                 // So we don't try to write again before this one finishes.
                 this.#writing = true;
                 await fs.writeFile(this.#file, JSON.stringify(settings));
                 this.#writing = false;
 
+                Log.write('Settings saved!');
                 return true;
             } catch (err) {
                 Log.write(err);

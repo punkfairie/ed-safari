@@ -38,13 +38,13 @@ journal.watch();
 
 $('#closeBtn').on('click', () => {
     ipcRenderer.send('CLOSE_WINDOW');
-})
+});
 
 /* ----------------------------------------------------------------- settings button handler ---- */
 
 $('#settingsBtn').on('click', () => {
     ipcRenderer.send('LOAD_SETTINGS');
-})
+});
 
 /* ------------------------------------------------------------------------- build body list ---- */
 
@@ -56,9 +56,9 @@ journal.once('BUILD_BODY_LIST', () => {
             const row = UI.createBodyRow(body);
 
             $('#scans').appendChild(row);
-        })
+        });
     }
-})
+});
 
 /* ----------------------------------------------------------------- started hyperspace jump ---- */
 
@@ -75,7 +75,7 @@ journal.on('ENTERED_NEW_SYSTEM', () => {
     if ($('#navRoute').children().length !== journal.navRoute.length) {
         journal.emit('SET_NAV_ROUTE');
     }
-})
+});
 
 /* ---------------------------------------------------------------------- body scan detected ---- */
 
@@ -98,7 +98,7 @@ journal.on('BODY_SCANNED', (body, DSS) => {
         const row = UI.createBodyRow(body);
         $('#scans').appendChild(row);
     }
-})
+});
 
 /* --------------------------------------------------------------------------- nav route set ---- */
 
@@ -116,9 +116,9 @@ journal.on('SET_NAV_ROUTE', () => {
                 const row = UI.createSystemRow(system);
                 $('#navRoute').appendChild(row);
             }
-        })
+        });
     }
-})
+});
 
 /* ------------------------------------------------------------------------ system value set ---- */
 
@@ -128,4 +128,4 @@ edsm.on('SYSTEM_APPRAISED', (system) => {
     if (systemRow.length > 0) {
         UI.setValue(systemRow, system.estimatedValueMapped);
     }
-})
+});

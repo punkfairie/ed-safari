@@ -33,6 +33,7 @@ $('#maxDistance').attr('value', settings.maxDistance);
 $('form').on('submit', async function (event) {
     event.preventDefault();
     $('.form-error').remove();
+    // TODO disable submit button.
 
     // Retrieve and normalize data.
     const formData = new FormData(event.target);
@@ -50,10 +51,15 @@ $('form').on('submit', async function (event) {
 
     if (isNaN(data.maxDistance)) {
         UI.addFormError('#maxDistance', 'Please enter a number!');
+        errors = true;
     }
+
+    // TODO re-enable submit button if errors.
 
     // If no errors, save.
     if (!errors) {
+        // TODO show some sort of saving thing?
+
         let tries = 0;
         do {
             let result = await settings.save(data);
@@ -65,5 +71,9 @@ $('form').on('submit', async function (event) {
                 break;
             }
         } while (tries < 3);
+
+        // Redirect to main window.
+        ipcRenderer.send('LOAD_MAIN');
     }
+
 });

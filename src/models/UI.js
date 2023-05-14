@@ -97,17 +97,17 @@ export class UI {
             valuableStyle = 'highlighted';
         }
 
-        const row = $('<div>').addClass('row ms-1 me-1');
+        const row = $('<div>').addClass('row ms-1 me-1 scanned-body');
         row.attr('id', body.bodyID);
 
         // spacer
-        row.appendChild($('<div>').addClass('col-1 system'));
+        row.appendChild($('<div>').addClass('col-1 system spacer'));
 
         // name
         const name = $('<div>');
         name.addClass(`col-2 text-start system ${chartedStyle} ${valuableStyle}`)
-        name.appendChild($('<i>')).addClass(`flaticon-${body.nameIcon()}`);
-        name.appendChild($('<span>')).text(body.simpleName());
+        name.appendChild($('<i>').addClass(`flaticon-${body.nameIcon()}`));
+        name.appendChild($('<span>').text(body.simpleName()));
         row.appendChild(name);
 
         // type icon
