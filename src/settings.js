@@ -7,9 +7,11 @@ const { ipcRenderer } = require('electron');
 const { setTimeout } = require('node:timers/promises');
 const { basename } = require('node:path');
 
+import { Safari } from './models/Safari';
 import { Settings } from './models/Settings';
 import { UI } from './models/UI';
 
+const safari = Safari.start();
 const settings = Settings.get();
 
 if (settings.matrix) {
@@ -25,13 +27,14 @@ settings.on('CUSTOM_COLORS_SET', () => {
 /* -------------------------------------------------------------------- close window handler ---- */
 
 $('#closeBtn').on('click', () => {
-    ipcRenderer.send('CLOSE_WINDOW')
+    safari.shutdown();
+    ipcRenderer.send('CLOSE_WINDOW');
 })
 
 /* ---------------------------------------------------------------- load main window handler ---- */
 
 $('.backBtn').on('click', () => {
-    ipcRenderer.send('LOAD_MAIN')
+    ipcRenderer.send('LOAD_MAIN');
 })
 
 /* ------------------------------------------------------------------- insert current values ---- */

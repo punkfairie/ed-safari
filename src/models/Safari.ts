@@ -14,6 +14,8 @@ export class Safari {
     #journalPattern?: string;
     journal?: Journal;
 
+    #watcher?: any;
+
     private constructor(isPackaged: boolean) {
         if (!isPackaged && os.platform() === 'linux') { // Account for WSL during development
             this.#journalDir = "/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/";
@@ -80,9 +82,16 @@ export class Safari {
 
     watchJournalDir(): void {
         const options = {usePolling: true, persistent: true, ignoreInitial: true};
-        const watcher = chokidar.watch(this.#journalPattern, options);
+        this.#watcher = chokidar.watch(this.#journalPattern, options);
 
-        watcher.on('ready', () => Log.write('Watching journal folder for changes...'));
-        watcher.on('add', () => this.journal = this.#getLatestJournal());
+        this.#watcher.on('ready', () => Log.write('Watching journal folder for changes...'));
+        this.#watcher.on('add', () => this.journal = this.#getLatestJournal());
+    }
+
+    /* ---------------------------------------------------------------------------- shutdown ---- */
+
+    async shutdown(): Promise<void> {
+        this.journal?.shutdown();
+        await this.#watcher.close();
     }
 }

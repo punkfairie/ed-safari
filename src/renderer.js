@@ -44,6 +44,7 @@ settings.on('CUSTOM_COLORS_SET', () => {
 /* -------------------------------------------------------------------- close window handler ---- */
 
 $('#closeBtn').on('click', () => {
+    safari.shutdown();
     ipcRenderer.send('CLOSE_WINDOW');
 });
 

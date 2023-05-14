@@ -18,6 +18,7 @@ export class Journal extends EventEmitter {
     testing: string;
     location: System;
     navRoute: System[];
+    #tail?: TailType;
 
     constructor(journalPath: string) {
         super();
@@ -218,12 +219,12 @@ export class Journal extends EventEmitter {
 
     // Watch the journal for changes.
     watch(): void {
-        const tail: TailType = new Tail(this.#path, {useWatchFile: true});
+        this.#tail = new Tail(this.#path, {useWatchFile: true});
 
         Log.write(`Watching ${path.basename(this.#path)}...`);
 
-        tail.on('line', (data) => data ? this.#parseLine(data) : undefined);
-        tail.on('error', (err) => Log.write(`Tail error in Journal.watch(): ${err}`));
+        this.#tail?.on('line', (data) => data ? this.#parseLine(data) : undefined);
+        this.#tail?.on('error', (err) => Log.write(`Tail error in Journal.watch(): ${err}`));
     }
 
     /* ------------------------------------------------------------------------ #parseLine() ---- */
@@ -296,7 +297,7 @@ export class Journal extends EventEmitter {
 
     /* --------------------------------------------------------------------- #handleScanLine ---- */
 
-    #handleScanLine(line: autoScan|detailedScan, DSS: boolean = false) {
+    #handleScanLine(line: autoScan|detailedScan, DSS: boolean = false): void {
         const dupChecker = {'BodyName': line.BodyName, 'BodyID': line.BodyID};
         let body: Body|null = null;
 
@@ -326,5 +327,11 @@ export class Journal extends EventEmitter {
 
         Log.write(`Scan detected. Body: ${line.BodyName}.`);
         this.emit('BODY_SCANNED', body, DSS);
+    }
+
+    /* ---------------------------------------------------------------------------- shutdown ---- */
+
+    shutdown(): void {
+        this.#tail?.unwatch();
     }
 }
