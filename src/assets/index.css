@@ -8,8 +8,21 @@
     font-display: swap;
 }
 
+:root {
+    --background: black;
+    --main: #F5A804;
+    --accent-dark: #0026FF;
+    --accent-light: #17EFF9;
+
+    --secondary-text: #EAA529;
+    --secondary-bg: #370C03;
+
+    --grey-text: #9f9f9f;
+    --grey-bg: #333333;
+}
+
 body {
-    background-color:black;
+    background-color:var(--background);
     font: 20px Eurostile, sans-serif;
     text-transform: uppercase;
 }
@@ -31,23 +44,23 @@ body {
     margin-right: 1px;
 }
 .charted {
-    color: #9f9f9f;
-    background: #333333;
+    color: var(--grey-text);
+    background: var(--grey-bg);
 }
 .uncharted {
-    color: #EAA529;
-    background: #370C03;
+    color: var(--secondary-text);
+    background: var(--secondary-bg);
 }
 
 .hyperspace {
-    color: #0026FF;
+    color: var(--accent-dark);
 }
 .statusInfo {
-    color: #EAA529;
-    background: #370C03;
+    color: var(--secondary-text);
+    background: var(--secondary-bg);
 }
 .inactive {
-    color: #000000;
+    color: var(--background);
 }
 
 .ring {
@@ -64,27 +77,27 @@ body {
 }
 
 div.highlighted b.active {
-    color: #000000;
+    color: var(--background);
 }
 div.highlighted b.inactive {
-    color: #F5A804;
+    color: var(--main);
 }
 div.uncharted b.active {
-    color: #EAA529;
+    color: var(--secondary-text);
 }
 div.uncharted b.inactive {
-    color: #370C03;
+    color: var(--secondary-bg);
 }
 div.charted b.active {
-    color: #9f9f9f;
+    color: var(--grey-text);
 }
 div.charted b.inactive {
-    color: #333333;
+    color: var(--grey-bg);
 }
 
 .highlighted {
-    color: #370C03;
-    background: #F5A804;
+    color: var(--secondary-bg);
+    background: var(--main);
 }
 
 div b.active.landable {
@@ -92,7 +105,7 @@ div b.active.landable {
 }
 
 .currentSystemHighlight {
-    background: #17EFF9;
+    background: var(--accent-light);
 }
 
 .current_location {
@@ -103,24 +116,24 @@ div b.active.landable {
 
 .latest-scan {
     border-style: dotted;
-    border-color: #F5A804;
+    border-color: var(--main);
     border-width: 1px;
 }
 
 .separator {
-    color: #F5A804;
-    border-color: #F5A804;
+    color: var(--main);
+    border-color: var(--main);
     border-width: 1px 0px 1px 0px;
     text-shadow: 0px 0px 3px;
     opacity: 100%;
 }
 
 .next-system {
-    color: #17EFF9;
+    color: var(--accent-light);
 }
 
 .next-system hr {
-    border-color: #17EFF9;
+    border-color: var(--accent-light);
 }
 
 .alert {
@@ -150,4 +163,17 @@ div b.active.landable {
 .gravity-hidden {
     color: #00000000;
     background-color: #00000000;
+}
+
+.form-control, .form-control:active, .form-control:focus {
+    margin-top: 5px;
+    background: transparent;
+    border-color: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+/* SET THIS TO PARENT VIA CSS */
+.form-control:focus {
+    border-color: var(--main);
 }

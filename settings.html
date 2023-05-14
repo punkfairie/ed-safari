@@ -13,6 +13,40 @@
         </div>
     </div>
 
+    <form id="settingsForm">
+        <div class="container-fluid">
+            <div class="row ms-1 me-1">
+                <label for="minValue" class="col col-form-label system charted">
+                    Minimum value:
+                </label>
+                <div class="col-2 system charted p-0">
+                    <!-- TODO INSERT CURRENT VALUE -->
+                    <input type="text" class="form-control" id="minValue">
+                </div>
+            </div>
+
+            <div class="row ms-1 me-1">
+                <label for="maxDistance" class="col col-form-label system charted">
+                    Maximum distance:
+                </label>
+                <div class="col-2 system charted p-0">
+                    <!-- TODO INSERT CURRENT VALUE -->
+                    <input type="text" class="form-control" id="maxDistance">
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="row separator align-items-center">
+                <div class="col"><hr class="separator"></div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+                <div class="col"><hr class="separator"></div>
+            </div>
+        </div>
+    </form>
+
     <script type="module" src="/src/settings.js"></script>
 </body>
 </html>
