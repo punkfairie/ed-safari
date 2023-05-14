@@ -159,7 +159,7 @@ export class UI {
         const row = $('<div>').addClass('row ms-1 me-1');
         row.attr('id', system.SystemAddress);
         // This is probably still the default 'true' value, but check in case the fetch() was quick.
-        const chartedStyle = system.charted ? 'charted' : 'uncharted';
+        const chartedStyle = system.charted ? 'uncharted' : 'uncharted';
 
         // name
         const name = $('<div>').addClass(`col system ${chartedStyle}`);

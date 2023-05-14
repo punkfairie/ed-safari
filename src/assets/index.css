@@ -14,8 +14,9 @@
     --accent-dark: #0026FF;
     --accent-light: #17EFF9;
 
-    --secondary-text: #EAA529;
-    --secondary-bg: #370C03;
+    --secondary-light: #EAA529;
+    --secondary-dark: #370C03;
+    /* --secondary-bg: color-mix(in srbg, black, var(--main)); */
 
     --grey-text: #9f9f9f;
     --grey-bg: #333333;
@@ -50,16 +51,16 @@ body {
     background: var(--grey-bg);
 }
 .uncharted {
-    color: var(--secondary-text);
-    background: var(--secondary-bg);
+    color: var(--secondary-light);
+    background: var(--secondary-dark);
 }
 
 .hyperspace {
     color: var(--accent-dark);
 }
 .statusInfo {
-    color: var(--secondary-text);
-    background: var(--secondary-bg);
+    color: var(--secondary-light);
+    background: var(--secondary-dark);
 }
 .inactive {
     color: var(--background);
@@ -85,10 +86,10 @@ div.highlighted b.inactive {
     color: var(--main);
 }
 div.uncharted b.active {
-    color: var(--secondary-text);
+    color: var(--secondary-light);
 }
 div.uncharted b.inactive {
-    color: var(--secondary-bg);
+    color: var(--secondary-dark);
 }
 div.charted b.active {
     color: var(--grey-text);
@@ -98,7 +99,7 @@ div.charted b.inactive {
 }
 
 .highlighted {
-    color: var(--secondary-bg);
+    color: var(--secondary-dark);
     background: var(--main);
 }
 
