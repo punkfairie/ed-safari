@@ -19,9 +19,6 @@ export class Settings {
     minValue: number;
     maxDistance: number;
 
-    color1?: {red: number, green: number, blue: number};
-    color2?: {red: number, green: number, blue: number};
-
     private constructor(isPackaged: boolean) {
         if (!isPackaged && os.platform() === 'linux') {
             this.#file = '/mnt/c/Users/marle/ed-safari-settings.json';

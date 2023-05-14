@@ -11,6 +11,7 @@ import { Settings } from './models/Settings';
 import { UI } from './models/UI';
 import { Body } from './models/Body';
 import { EDSM } from './models/EDSM';
+import { blend } from './assets/blend';
 
 // Grab app.isPackaged from main process
 let isPackaged = false;
@@ -129,3 +130,7 @@ edsm.on('SYSTEM_APPRAISED', (system) => {
         UI.setValue(systemRow, system.estimatedValueMapped);
     }
 });
+
+// const color = blend([245, 168, 4], [0, 0, 0], [0.4, 0.6]);
+// const rgb = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+// $('body').css('--secondary-dark', rgb);

@@ -45,32 +45,24 @@
             </div>
 
             <div class="row ms-1 me-1">
-                <label class="col col-form-label system charted">
-                    Main color in RGB:
-                </label>
-                <div class="col-1 system charted p-0">
-                    <input type="text" class="form-control" id="color1R" name="color1R">
+                <div class="col col-form-label system charted">
+                    Where to get RGB matrix:
                 </div>
-                <div class="col-1 system charted p-0">
-                    <input type="text" class="form-control" id="color1G" name="color1G">
+                <div class="col-auto system charted p-0">
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" name="matrixSource" id="matrixSourceDefault" value="default" checked>
+                        <label for="matrixSourceDefault" class="form-check-label">
+                            GraphicsConfiguration.xml
+                        </label>
+                    </div>
                 </div>
-                <div class="col-1 system charted p-0">
-                    <input type="text" class="form-control" id="color1B" name="color1B">
-                </div>
-            </div>
-
-            <div class="row ms-1 me-1">
-                <label class="col col-form-label system charted">
-                    Accent color in RGB:
-                </label>
-                <div class="col-1 system charted p-0">
-                    <input type="text" class="form-control" id="color2R" name="color2R">
-                </div>
-                <div class="col-1 system charted p-0">
-                    <input type="text" class="form-control" id="color2G" name="color2G">
-                </div>
-                <div class="col-1 system charted p-0">
-                    <input type="text" class="form-control" id="color2B" name="color2B">
+                <div class="col-auto system charted p-0">
+                    <div class="form-check form-check-inline">
+                        <input type="radio" class="form-check-input" id="matrixSourceEDHM" name="matrixSource" value="EDHM">
+                        <label for="matrixSourceEDHM" class="form-check-label">
+                            EDHM XML-Profile.ini
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>

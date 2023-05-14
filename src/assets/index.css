@@ -11,12 +11,11 @@
 :root {
     --background: black;
     --main: #F5A804;
-    --accent-dark: #0026FF;
-    --accent-light: #17EFF9;
+    --accent-dark: #000e5f;
+    --accent-light: #17cbd4;
 
     --secondary-light: #EAA529;
     --secondary-dark: #370C03;
-    /* --secondary-bg: color-mix(in srbg, black, var(--main)); */
 
     --grey-text: #9f9f9f;
     --grey-bg: #333333;
@@ -51,8 +50,8 @@ body {
     background: var(--grey-bg);
 }
 .uncharted {
-    color: var(--secondary-light);
-    background: var(--secondary-dark);
+    color: var(--accent-light);
+    background: var(--accent-dark);
 }
 
 .hyperspace {
