@@ -90,3 +90,6 @@ typings/
 
 # Electron-Forge
 out/
+
+# Not sure where this file is coming from, but it causes errors on branch-switch
+*:Zone.Identifier
