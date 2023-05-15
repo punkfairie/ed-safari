@@ -9,89 +9,92 @@ import { Journal } from "./Journal";
 import { Log } from "./Log";
 
 export class Safari {
-    static #instance: Safari;
-    #journalDir?: string;
-    #journalPattern?: string;
-    journal?: Journal;
+  static #instance: Safari;
 
-    #watcher?: any;
+  readonly #journalDir?: string;
+  readonly #journalPattern?: string;
+  journal?: Journal;
 
-    private constructor(isPackaged: boolean) {
-        if (!isPackaged && os.platform() === 'linux') { // Account for WSL during development
-            this.#journalDir = "/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/";
+  #watcher?: any;
 
-        } else if (os.platform() === 'win32') { // Windows
-            this.#journalDir = path.join(
-                os.homedir(),
-                'Saved Games',
-                'Frontier Developments',
-                'Elite Dangerous'
-            );
+  private constructor(isPackaged: boolean) {
+    if (!isPackaged && os.platform() === 'linux') { // Account for WSL during development
+      this.#journalDir = "/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/";
 
-        } else if (os.platform() === 'linux') { // Linux
-            this.#journalDir = path.join(
-                os.homedir(),
-                '.local',
-                'share',
-                'Steam',
-                'steamapps',
-                'compatdata',
-                '359320',
-                'pfx',
-                'drive_c',
-                'steamuser',
-                'Saved Games',
-                'Frontier Developments',
-                'Elite Dangerous',
-            );
-        } else {
-            Log.write(`ERROR: Journal files not found. OS: ${os.platform()}.`);
-        }
+    } else if (os.platform() === 'win32') { // Windows
+      this.#journalDir = path.join(
+          os.homedir(),
+          'Saved Games',
+          'Frontier Developments',
+          'Elite Dangerous'
+      );
 
-        if (this.#journalDir) {
-            this.#journalPattern = path.join(this.#journalDir, 'Journal.*.log');
-            this.journal = this.#getLatestJournal();
-        }
+    } else if (os.platform() === 'linux') { // Linux
+      this.#journalDir = path.join(
+          os.homedir(),
+          '.local',
+          'share',
+          'Steam',
+          'steamapps',
+          'compatdata',
+          '359320',
+          'pfx',
+          'drive_c',
+          'steamuser',
+          'Saved Games',
+          'Frontier Developments',
+          'Elite Dangerous',
+      );
+    } else {
+      Log.write(`ERROR: Journal files not found. OS: ${os.platform()}.`);
     }
 
-    static start(isPackaged: boolean): Safari {
-        if (!Safari.#instance) {
-            Safari.#instance = new Safari(isPackaged);
-        }
+    if (this.#journalDir) {
+      this.#journalPattern = path.join(this.#journalDir, 'Journal.*.log');
+      this.journal = this.#getLatestJournal();
+    }
+  }
 
-        return Safari.#instance;
+  static start(isPackaged: boolean): Safari {
+    if (!Safari.#instance) {
+      Safari.#instance = new Safari(isPackaged);
     }
 
-    /* ------------------------------------------------------------------- #getLatestJournal ---- */
+    return Safari.#instance;
+  }
 
-    // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
-    #getLatestJournal(): Journal|undefined {
-        const journals = globSync(this.#journalPattern, {windowsPathsNoEscape: true});
-        const journalPath: string|undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
+  /* ------------------------------------------------------------------- #getLatestJournal ---- */
 
-        if (journalPath) {
-            Log.write(`New journal file found, now watching ${path.basename(journalPath)}.`);
-            return new Journal(journalPath);
-        } else {
-            Log.write('ERROR: Unable to find latest journal.');
-            return;
-        }
+  // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
+  #getLatestJournal(): Journal|undefined {
+    // @ts-ignore
+    const journals = globSync(this.#journalPattern, {windowsPathsNoEscape: true});
+    const journalPath: string|undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
+
+    if (journalPath) {
+      Log.write(`New journal file found, now watching ${path.basename(journalPath)}.`);
+      return new Journal(journalPath);
+    } else {
+      Log.write('ERROR: Unable to find latest journal.');
+      return;
     }
+  }
 
-    /* --------------------------------------------------------------------- watchJournalDir ---- */
+  /* --------------------------------------------------------------------- watchJournalDir ---- */
 
-    watchJournalDir(): void {
-        const options = {usePolling: true, persistent: true, ignoreInitial: true};
-        this.#watcher = chokidar.watch(this.#journalPattern, options);
+  watchJournalDir(): void {
+    const options = {usePolling: true, persistent: true, ignoreInitial: true};
+    // @ts-ignore
+    this.#watcher = chokidar.watch(this.#journalPattern, options);
 
-        this.#watcher.on('ready', () => Log.write('Watching journal folder for changes...'));
-        this.#watcher.on('add', () => this.journal = this.#getLatestJournal());
-    }
+    this.#watcher.on('ready', () => Log.write('Watching journal folder for changes...'));
+    this.#watcher.on('add', () => this.journal = this.#getLatestJournal());
+  }
 
-    /* ---------------------------------------------------------------------------- shutdown ---- */
+  /* ---------------------------------------------------------------------------- shutdown ---- */
 
-    async shutdown(): Promise<void> {
-        this.journal?.shutdown();
-        await this.#watcher.close();
-    }
+  async shutdown(): Promise<void> {
+    this.journal?.shutdown();
+    await this.#watcher.close();
+  }
 }
