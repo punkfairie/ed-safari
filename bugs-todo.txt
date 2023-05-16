@@ -1,0 +1,12 @@
+BUGS:
+changing 1 setting that isn't color file, removes color file
+show valuable bodies in case system was discovered before
+on no star discovery after jump, pull bodies from EDSM and appraise???
+investigate border around current system, perhaps hyperspace indicator fucking up?
+make title dynamic
+make name col wider to accomodate belts
+bodies don't seem to be sorting while scanning
+systems sometimes show as NaN
+make star name not empty if it's the only star
+add minimize button
+add star class to system name
