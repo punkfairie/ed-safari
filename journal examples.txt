@@ -50,6 +50,9 @@ COMPLETE HYPERSPACE JUMP - UNPOPULATED SYSTEM
 NAV ROUTE
 { "timestamp":"2023-05-09T23:12:00Z", "event":"NavRoute" }
 
+NAV ROUTE CLEAR
+{ "timestamp":"2023-04-15T04:09:39Z", "event":"NavRouteClear" }
+
 NAVROUTE.JSON
 { "timestamp":"2023-05-10T00:32:42Z", "event":"NavRoute", "Route":[ 
 { "StarSystem":"LHS 1068", "SystemAddress":5068195571105, "StarPos":[-46.65625,-33.06250,-22.81250], "StarClass":"M" }, 

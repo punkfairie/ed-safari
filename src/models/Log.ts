@@ -1,7 +1,8 @@
 export class Log {
-    constructor() {}
+  constructor() {}
 
-    static write(message: string): void {
-        console.log(message)
-    } 
+  static write(message: string): void {
+    // TODO: make this write to file.
+    //console.log(message)
+  }
 }

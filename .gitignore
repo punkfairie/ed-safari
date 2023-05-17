@@ -7,7 +7,7 @@ yarn-error.log*
 lerna-debug.log*
 
 # Add back journals
-!journal_folder/*
+!test_journals/*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

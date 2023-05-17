@@ -1,12 +1,13 @@
 const chokidar = require('chokidar');
 const fs = require('node:fs');
-const { globSync } = require('glob');
+const {globSync} = require('glob');
 import * as _ from 'lodash-es';
+
 const os = require('node:os');
 const path = require('node:path');
 
-import { Journal } from "./Journal";
-import { Log } from "./Log";
+import {Journal} from './Journal';
+import {Log} from './Log';
 
 export class Safari {
   static #instance: Safari;
@@ -17,16 +18,19 @@ export class Safari {
 
   #watcher?: any;
 
-  private constructor(isPackaged: boolean) {
-    if (!isPackaged && os.platform() === 'linux') { // Account for WSL during development
-      this.#journalDir = "/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/";
+  private constructor(isPackaged: boolean, isTesting: boolean = false) {
+    if (isTesting) {
+      this.#journalDir = require('app-root-path').resolve('/test_journals');
+
+    } else if (!isPackaged && os.platform() === 'linux') { // Account for WSL during development
+      this.#journalDir = '/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/';
 
     } else if (os.platform() === 'win32') { // Windows
       this.#journalDir = path.join(
           os.homedir(),
           'Saved Games',
           'Frontier Developments',
-          'Elite Dangerous'
+          'Elite Dangerous',
       );
 
     } else if (os.platform() === 'linux') { // Linux
@@ -55,9 +59,9 @@ export class Safari {
     }
   }
 
-  static start(isPackaged: boolean): Safari {
+  static start(isPackaged: boolean, isTesting: boolean = false): Safari {
     if (!Safari.#instance) {
-      Safari.#instance = new Safari(isPackaged);
+      Safari.#instance = new Safari(isPackaged, isTesting);
     }
 
     return Safari.#instance;
@@ -66,10 +70,10 @@ export class Safari {
   /* ------------------------------------------------------------------- #getLatestJournal ---- */
 
   // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
-  #getLatestJournal(): Journal|undefined {
+  #getLatestJournal(): Journal | undefined {
     // @ts-ignore
     const journals = globSync(this.#journalPattern, {windowsPathsNoEscape: true});
-    const journalPath: string|undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
+    const journalPath: string | undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
 
     if (journalPath) {
       Log.write(`New journal file found, now watching ${path.basename(journalPath)}.`);
@@ -95,6 +99,6 @@ export class Safari {
 
   async shutdown(): Promise<void> {
     this.journal?.shutdown();
-    await this.#watcher.close();
+    await this.#watcher?.close();
   }
 }
