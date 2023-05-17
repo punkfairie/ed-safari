@@ -6,12 +6,6 @@ function __setFileContents(contents) {
     fileContents = contents;
 }
 
-let writePromise = null;
-
-function __setWritePromise(resolve) {
-    writePromise = Promise.resolve(resolve);
-}
-
 // example info from Node docs
 function statSync(file) {
     return {
@@ -44,16 +38,9 @@ function readFileSync(file, options) {
     return fileContents;
 }
 
-let promises = {
-    writeFile: jest.fn(() => writePromise),
-    readFile: jest.fn(() => fileContents),
-};
-
 fs.__setFileContents = __setFileContents;
-fs.__setWritePromise = __setWritePromise;
 fs.statSync = statSync;
 fs.writeFileSync = writeFileSync;
 fs.readFileSync = readFileSync;
-fs.promises = promises;
 
 module.exports = fs;

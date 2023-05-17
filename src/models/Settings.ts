@@ -20,10 +20,9 @@ interface settingsFile {
 }
 
 export class Settings extends EventEmitter {
-  static #instance: Settings;
+  static #instance: Settings | undefined;
 
   readonly #file: string;
-  #writing: boolean;
 
   minValue: number;
   maxDistance: number;
@@ -61,7 +60,6 @@ export class Settings extends EventEmitter {
     this.minValue = contents.minValue;
     this.maxDistance = contents.maxDistance;
     this.#matrixFile = contents.matrixFile;
-    this.#writing = false;
 
     if (this.#matrixFile) {
       this.#setMatrix();
@@ -76,6 +74,10 @@ export class Settings extends EventEmitter {
     return Settings.#instance;
   }
 
+  static destroy(): void {
+    Settings.#instance = undefined;
+  }
+
   /* -------------------------------------------------------------------------------- save ---- */
 
   async save(settings: settingsFile): Promise<boolean> {
@@ -86,8 +88,11 @@ export class Settings extends EventEmitter {
 
       Log.write('Settings saved!');
 
-      // Update Settings props.
-      await this.#read();
+      try {
+        await this.#read();
+      } catch (err) {
+        Log.write(err);
+      }
 
       return true;
 
