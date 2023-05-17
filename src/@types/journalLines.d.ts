@@ -131,7 +131,7 @@ export interface planetScan<scanType> extends journalEntry<'Scan'> {
   WasMapped: boolean,
 }
 
-export type autoScan = starScan<'AutoScan'> & asteroidScan<'AutoScan'> & planetScan<'AutoScan'>
+export type autoScan = starScan<'AutoScan'> | asteroidScan<'AutoScan'> | planetScan<'AutoScan'>
 export type detailedScan = starScan<'Detailed'> & asteroidScan<'Detailed'> & planetScan<'Detailed'>
 export type discoveryScan = detailedScan
 export type fssScan = detailedScan

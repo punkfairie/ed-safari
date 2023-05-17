@@ -48,8 +48,8 @@ export class Body {
 
   /* ---------------------------------------------------------------------------- nameIcon ---- */
 
-  nameIcon(): string | null {
-    let nameIcon: string | null = null;
+  nameIcon(): string {
+    let nameIcon: string = '';
 
     if (this.isAsteroid()) {
       nameIcon = 'asteroid-4';
@@ -70,8 +70,8 @@ export class Body {
 
   /* ---------------------------------------------------------------------------- typeIcon ---- */
 
-  typeIcon(): string | null {
-    let typeIcon: string | null = null;
+  typeIcon(): string {
+    let typeIcon: string = '';
 
     if (this.isStar() || this.isAsteroid()) {
       typeIcon = this.nameIcon();
@@ -247,8 +247,8 @@ export class Body {
 
     let finalValue = Math.max((
                                   value + (
-                                            value * Math.pow(mass, 0.2) * q
-                                        )
+                                      value * Math.pow(mass, 0.2) * q
+                                  )
                               ) * mapMultiplier, 500);
 
     // First discovery bonus.
