@@ -3,29 +3,6 @@ interface journalEntry<eventType = string> {
   event: eventType,
 }
 
-export interface discoveryHonk extends journalEntry<'FSSDiscoveryScan'> {
-  Progress: number,
-  BodyCount: number,
-  NonBodyCount: number,
-  SystemName: string,
-  SystemAddress: number,
-}
-
-export interface completedSystemFSSScan extends journalEntry<'FSSAllBodiesFound'> {
-  event: 'FSSAllBodiesFound',
-  SystemName: string,
-  SystemAddress: number,
-  Count: number,
-}
-
-export interface dssIndicator extends journalEntry<'SAAScanComplete'> {
-  BodyName: string,
-  SystemAddress: number,
-  BodyID: number,
-  ProbesUsed: number,
-  EfficiencyTarget: number,
-}
-
 interface bodyParent {
   [index: string]: number,
 }
@@ -131,18 +108,8 @@ export interface planetScan<scanType> extends journalEntry<'Scan'> {
   WasMapped: boolean,
 }
 
-export type autoScan = starScan<'AutoScan'> | asteroidScan<'AutoScan'> | planetScan<'AutoScan'>
-export type detailedScan = starScan<'Detailed'> & asteroidScan<'Detailed'> & planetScan<'Detailed'>
-export type discoveryScan = detailedScan
-export type fssScan = detailedScan
-export type dssScan = detailedScan
-
-export interface startFsdJump extends journalEntry<'StartJump'> {
-  JumpType: 'Hyperspace',
-  StarSystem: string,
-  SystemAddress: number,
-  StarClass: string,
-}
+export type autoScan = starScan<'AutoScan'>|asteroidScan<'AutoScan'>|planetScan<'AutoScan'>
+export type detailedScan = starScan<'Detailed'>&asteroidScan<'Detailed'>&planetScan<'Detailed'>
 
 interface faction {
   Name: string,

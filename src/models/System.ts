@@ -1,10 +1,11 @@
-import { FSDJump } from '@kayahr/ed-journal';
-import type { location, navRouteSystem } from '../@types/journalLines';
+import { FSDJump, ExtendedNavRoute, Location } from '@kayahr/ed-journal';
 
 import * as _ from 'lodash-es';
 
 import { Body } from './Body';
 import { EDSM } from './EDSM';
+
+type ExtendedNavRouteSystem = (ExtendedNavRoute)['Route'][0];
 
 export class System {
   name: string;
@@ -18,7 +19,7 @@ export class System {
   estimatedValueMapped?: number;
   valuableBodies?: Body[];
 
-  constructor(line?: navRouteSystem|FSDJump|location) {
+  constructor(line?: ExtendedNavRouteSystem|FSDJump|Location) {
     if (!line) {
       this.name = 'Unknown';
     } else {
