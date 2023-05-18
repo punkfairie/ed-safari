@@ -8,7 +8,6 @@ const {statSync, writeFileSync, readFileSync} = require('fs');
 const ini = require('ini');
 const os = require('node:os');
 const path = require('node:path');
-const {setTimeout} = require('node:timers/promises');
 const xmlJS = require('xml-js');
 
 import {Log} from './Log';
