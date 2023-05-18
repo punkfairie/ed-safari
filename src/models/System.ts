@@ -1,9 +1,10 @@
-import type {completeFsdJump, location, navRouteSystem} from '../@types/journalLines';
+import { FSDJump } from '@kayahr/ed-journal';
+import type { location, navRouteSystem } from '../@types/journalLines';
 
 import * as _ from 'lodash-es';
 
-import {Body} from './Body';
-import {EDSM} from './EDSM';
+import { Body } from './Body';
+import { EDSM } from './EDSM';
 
 export class System {
   name: string;
@@ -17,11 +18,11 @@ export class System {
   estimatedValueMapped?: number;
   valuableBodies?: Body[];
 
-  constructor(line?: navRouteSystem | completeFsdJump | location) {
+  constructor(line?: navRouteSystem|FSDJump|location) {
     if (!line) {
       this.name = 'Unknown';
     } else {
-      this.name = line.StarSystem;
+      this.name          = line.StarSystem;
       this.SystemAddress = line.SystemAddress;
 
       if ('StarClass' in line) {
@@ -33,7 +34,7 @@ export class System {
     // Set this to true initially, since it likely is and the system is technically inserted
     // into the UI before it's appraised.
     this.charted = true;
-    this.bodies = [];
+    this.bodies  = [];
 
     if (this.name !== 'Unknown') {
       this.#getValue();
@@ -47,7 +48,7 @@ export class System {
     const data = await EDSM.getSystemValue(this);
 
     if (data) {
-      this.estimatedValue = data.estimatedValue;
+      this.estimatedValue       = data.estimatedValue;
       this.estimatedValueMapped = data.estimatedValueMapped;
 
       // If EDSM doesn't have an estimate, then it's likely undiscovered.
