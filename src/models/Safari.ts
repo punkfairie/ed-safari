@@ -73,4 +73,10 @@ export class Safari extends EventEmitter {
 
     return dir;
   }
+
+  /* ------------------------------------------------------------------------------ shutdown ---- */
+
+  shutdown(): void {
+    this.CMDR?.shutdown();
+  }
 }
