@@ -1,16 +1,16 @@
-import {EliteMatrix} from 'elite-matrix';
-import {PathLike} from 'fs';
+import { EliteMatrix } from 'elite-matrix';
+import type { PathLike } from 'fs';
 
-const EventEmitter = require('node:events');
+const EventEmitter                              = require('node:events');
 // Jest can't parse 'node:fs' so this has to be 'fs' for testing.
-const fs = require('fs/promises');
-const {statSync, writeFileSync, readFileSync} = require('fs');
-const ini = require('ini');
-const os = require('node:os');
-const path = require('node:path');
-const xmlJS = require('xml-js');
+const fs                                        = require('fs/promises');
+const { statSync, writeFileSync, readFileSync } = require('fs');
+const ini                                       = require('ini');
+const os                                        = require('node:os');
+const path                                      = require('node:path');
+const xmlJS                                     = require('xml-js');
 
-import {Log} from './Log';
+import { Log } from './Log';
 
 interface settingsFile {
   minValue: number,
@@ -19,14 +19,14 @@ interface settingsFile {
 }
 
 export class Settings extends EventEmitter {
-  static #instance: Settings | undefined;
+  static #instance: Settings|undefined;
 
   readonly #file: string;
 
   minValue: number;
   maxDistance: number;
 
-  #matrixFile: null | string;
+  #matrixFile: null|string;
   matrix?: EliteMatrix;
 
   private constructor(isPackaged: boolean) {
@@ -55,10 +55,10 @@ export class Settings extends EventEmitter {
     }
 
     // Initial reading of settings file done in sync for same reasons as above.
-    const contents: settingsFile = JSON.parse(readFileSync(this.#file, {encoding: 'utf8'}));
-    this.minValue = contents.minValue;
-    this.maxDistance = contents.maxDistance;
-    this.#matrixFile = contents.matrixFile;
+    const contents: settingsFile = JSON.parse(readFileSync(this.#file, { encoding: 'utf8' }));
+    this.minValue                = contents.minValue;
+    this.maxDistance             = contents.maxDistance;
+    this.#matrixFile             = contents.matrixFile;
 
     if (this.#matrixFile) {
       this.#setMatrix();
@@ -105,10 +105,10 @@ export class Settings extends EventEmitter {
 
   async #read(): Promise<boolean> {
     try {
-      const file: string = await fs.readFile(this.#file, {encoding: 'utf8'});
+      const file: string           = await fs.readFile(this.#file, { encoding: 'utf8' });
       const contents: settingsFile = JSON.parse(file);
 
-      this.minValue = contents.minValue;
+      this.minValue    = contents.minValue;
       this.maxDistance = contents.maxDistance;
       this.#matrixFile = contents.matrixFile;
 
@@ -127,50 +127,54 @@ export class Settings extends EventEmitter {
   /* -------------------------------------------------------------------------- #setMatrix ---- */
 
   async #setMatrix(): Promise<void> {
-    const file: string = await fs.readFile((
-        this.#matrixFile as PathLike
-    ), {encoding: 'utf8'});
-
-    let matrixRed: [number, number, number];
-    let matrixGreen: [number, number, number];
-    let matrixBlue: [number, number, number];
+    const file: string = await fs.readFile((this.#matrixFile as PathLike), { encoding: 'utf8' });
 
     if (this.#matrixFile && path.basename(this.#matrixFile) === 'GraphicsConfiguration.xml') {
-      const options = {
-        trim:              true,
-        ignoreDeclaration: true,
-        ignoreAttributes:  true,
-        compact:           true,
-        textKey:           '$',
-      };
-      const contents = xmlJS.xml2js(file, options);
-
-      let matrix = [
-        contents.GraphicsConfig.GUIColour.Default.MatrixRed.$,
-        contents.GraphicsConfig.GUIColour.Default.MatrixGreen.$,
-        contents.GraphicsConfig.GUIColour.Default.MatrixBlue.$,
-      ];
-
-      matrix = matrix.map(v => v.replace(/\s/g, '').split(','));
-
-      matrixRed = matrix[0].length === 3 ? matrix[0] : [1, 0, 0];
-      matrixGreen = matrix[1].length === 3 ? matrix[1] : [0, 1, 0];
-      matrixBlue = matrix[2].length === 3 ? matrix[2] : [0, 0, 1];
-
-      this.matrix = new EliteMatrix(matrixRed, matrixGreen, matrixBlue);
+      this.matrix = await this.#getMatrixFromXml(file);
 
     } else if (this.#matrixFile && path.basename(this.#matrixFile) === 'XML-Profile.ini') {
-      const contents = (
-          ini.parse(file)
-      ).constants;
-
-      matrixRed = [contents.x150, contents.y150, contents.z150];
-      matrixGreen = [contents.x151, contents.y151, contents.z151];
-      matrixBlue = [contents.x152, contents.y152, contents.z152];
-
-      this.matrix = new EliteMatrix(matrixRed, matrixGreen, matrixBlue);
+      this.matrix = await this.#getMatrixFromIni(file);
     }
 
     this.emit('CUSTOM_COLORS_SET');
+  }
+
+  /* --------------------------------------------------------------------- #getMatrixFromXml ---- */
+
+  async #getMatrixFromXml(file: string): Promise<EliteMatrix> {
+    const options  = {
+      trim:              true,
+      ignoreDeclaration: true,
+      ignoreAttributes:  true,
+      compact:           true,
+      textKey:           '$',
+    };
+    const contents = xmlJS.xml2js(file, options);
+
+    let matrix = [
+      contents.GraphicsConfig.GUIColour.Default.MatrixRed.$,
+      contents.GraphicsConfig.GUIColour.Default.MatrixGreen.$,
+      contents.GraphicsConfig.GUIColour.Default.MatrixBlue.$,
+    ];
+
+    matrix = matrix.map(v => v.replace(/\s/g, '').split(','));
+
+    const matrixRed: [number, number, number]   = matrix[0].length === 3 ? matrix[0] : [1, 0, 0];
+    const matrixGreen: [number, number, number] = matrix[1].length === 3 ? matrix[1] : [0, 1, 0];
+    const matrixBlue: [number, number, number]  = matrix[2].length === 3 ? matrix[2] : [0, 0, 1];
+
+    return new EliteMatrix(matrixRed, matrixGreen, matrixBlue);
+  }
+
+  /* --------------------------------------------------------------------- #getMatrixFromIni ---- */
+
+  async #getMatrixFromIni(file: string): Promise<EliteMatrix> {
+    const contents = (ini.parse(file)).constants;
+
+    const matrixRed: [number, number, number]   = [contents.x150, contents.y150, contents.z150];
+    const matrixGreen: [number, number, number] = [contents.x151, contents.y151, contents.z151];
+    const matrixBlue: [number, number, number]  = [contents.x152, contents.y152, contents.z152];
+
+    return new EliteMatrix(matrixRed, matrixGreen, matrixBlue);
   }
 }
