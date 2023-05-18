@@ -1,16 +1,24 @@
 import type { Tail as TailType } from 'tail';
-import type { autoScan, completeFsdJump, detailedScan, journalEntry, navRoute, planetScan } from "../@types/journalLines";
+import type {
+  autoScan,
+  completeFsdJump,
+  detailedScan,
+  journalEntry,
+  navRoute,
+  planetScan,
+} from '../@types/journalLines';
 
 const EventEmitter = require('node:events');
 import * as _ from 'lodash-es';
-const path = require('node:path');
-const { readFile } = require('node:fs/promises');
-const reverseLineReader = require('reverse-line-reader');
-const Tail = require('tail').Tail;
 
-import { System } from "./System";
-import { Log } from "./Log";
-import { Body } from "./Body";
+const path              = require('node:path');
+const { readFile }      = require('node:fs/promises');
+const reverseLineReader = require('reverse-line-reader');
+const Tail              = require('tail').Tail;
+
+import { System } from './System';
+import { Log } from './Log';
+import { Body } from './Body';
 
 
 export class Journal extends EventEmitter {
@@ -22,7 +30,7 @@ export class Journal extends EventEmitter {
   constructor(journalPath: string) {
     super();
 
-    this.#path = journalPath;
+    this.#path    = journalPath;
     this.location = new System();
     this.navRoute = [];
 
@@ -97,7 +105,7 @@ export class Journal extends EventEmitter {
 
   // Look for all scanned bodies before last FSDJump, for same reasons as getting location.
   #getScannedBodies(): void {
-    let dssLine: detailedScan|null = null
+    let dssLine: detailedScan|null = null;
 
     reverseLineReader.eachLine(this.#path, (raw: string) => {
       if (raw) {
@@ -110,8 +118,8 @@ export class Journal extends EventEmitter {
             this.location.bodies.push(new Body(dssLine, true));
           } else {
             // Else, check that the body hasn't already been added (by a DSS scan line).
-            const dupChecker = {'BodyName': dssLine.BodyName, 'BodyID': dssLine.BodyID};
-            const r = _.find(this.location.bodies, dupChecker);
+            const dupChecker = { 'BodyName': dssLine.BodyName, 'BodyID': dssLine.BodyID };
+            const r          = _.find(this.location.bodies, dupChecker);
 
             if (r === undefined) {
               // Body was not already logged, so add to list.
@@ -140,9 +148,9 @@ export class Journal extends EventEmitter {
             if ('PlanetClass' in line) {
               const dupChecker = {
                 'BodyName': (line as planetScan<'AutoScan'>).BodyName,
-                'BodyID': (line as planetScan<'AutoScan'>).BodyID,
+                'BodyID':   (line as planetScan<'AutoScan'>).BodyID,
               };
-              const r = _.find(this.location.bodies, dupChecker);
+              const r          = _.find(this.location.bodies, dupChecker);
 
               if (r === undefined) {
                 this.location.bodies.push(new Body((line as autoScan)));
@@ -168,18 +176,18 @@ export class Journal extends EventEmitter {
 
       Log.write('Checking for nav route.');
       this.#getNavRoute();
-    })
+    });
   }
 
   /* ------------------------------------------------------------------------ #getNavRoute ---- */
 
   async #getNavRoute(): Promise<void> {
-    this.navRoute = [] // Clear previous route, to catch overwritten routes.
+    this.navRoute              = []; // Clear previous route, to catch overwritten routes.
     let routeFile: string|null = null;
 
     try {
       const filePath: string = path.dirname(this.#path) + '/NavRoute.json';
-      routeFile = await readFile(filePath, {encoding: 'utf8'});
+      routeFile              = await readFile(filePath, { encoding: 'utf8' });
     } catch (err) {
       Log.write(`Error reading nav route file: ${err.message}.`);
     }
@@ -199,7 +207,7 @@ export class Journal extends EventEmitter {
         if (push && system.SystemAddress !== this.location.SystemAddress) {
           this.navRoute.push(new System(system));
         }
-      })
+      });
 
       if (this.navRoute.length > 0) {
         Log.write('Nav route set.');
@@ -216,7 +224,7 @@ export class Journal extends EventEmitter {
 
   // Watch the journal for changes.
   watch(): void {
-    this.#tail = new Tail(this.#path, {useWatchFile: true});
+    this.#tail = new Tail(this.#path, { useWatchFile: true });
 
     Log.write(`Watching ${path.basename(this.#path)}...`);
 
@@ -229,7 +237,7 @@ export class Journal extends EventEmitter {
   // Parse and handle journal lines.
   #parseLine(raw: string) {
     const line: journalEntry = JSON.parse(raw);
-    let dssFlag: boolean = false;
+    let dssFlag: boolean     = false;
 
     switch (line.event) {
         // Hyperspace jump started (3.. 2.. 1..)
@@ -286,7 +294,7 @@ export class Journal extends EventEmitter {
     if (this.navRoute.length > 0) {
       _.remove(this.navRoute, (system) => {
         return system.SystemAddress === this.location.SystemAddress;
-      })
+      });
     }
 
     this.emit('ENTERED_NEW_SYSTEM');
@@ -295,7 +303,7 @@ export class Journal extends EventEmitter {
   /* --------------------------------------------------------------------- #handleScanLine ---- */
 
   #handleScanLine(line: autoScan|detailedScan, DSS: boolean = false): void {
-    const dupChecker = {'BodyName': line.BodyName, 'BodyID': line.BodyID};
+    const dupChecker    = { 'BodyName': line.BodyName, 'BodyID': line.BodyID };
     let body: Body|null = null;
 
     // If it's a DSS scan, then we should have already added the body to the list. But we'll

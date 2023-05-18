@@ -1,13 +1,12 @@
-const chokidar = require('chokidar');
-const fs = require('node:fs');
-const {globSync} = require('glob');
+const chokidar     = require('chokidar');
+const fs           = require('node:fs');
+const { globSync } = require('glob');
+const os           = require('node:os');
+const path         = require('node:path');
+
+import { Journal } from './Journal';
+import { Log } from './Log';
 import * as _ from 'lodash-es';
-
-const os = require('node:os');
-const path = require('node:path');
-
-import {Journal} from './Journal';
-import {Log} from './Log';
 
 export class Safari {
   static #instance: Safari;
@@ -18,12 +17,9 @@ export class Safari {
 
   #watcher?: any;
 
-  private constructor(isPackaged: boolean, isTesting: boolean = false) {
-    if (isTesting) {
+  private constructor(isPackaged: boolean = false) {
+    if (!isPackaged && os.platform() === 'linux') {
       this.#journalDir = require('app-root-path').resolve('/test_journals');
-
-    } else if (!isPackaged && os.platform() === 'linux') { // Account for WSL during development
-      this.#journalDir = '/mnt/c/Users/marle/Saved\ Games/Frontier\ Developments/Elite\ Dangerous/';
 
     } else if (os.platform() === 'win32') { // Windows
       this.#journalDir = path.join(
@@ -55,13 +51,13 @@ export class Safari {
 
     if (this.#journalDir) {
       this.#journalPattern = path.join(this.#journalDir, 'Journal.*.log');
-      this.journal = this.#getLatestJournal();
+      this.journal         = this.#getLatestJournal();
     }
   }
 
-  static start(isPackaged: boolean, isTesting: boolean = false): Safari {
+  static start(isPackaged: boolean = false): Safari {
     if (!Safari.#instance) {
-      Safari.#instance = new Safari(isPackaged, isTesting);
+      Safari.#instance = new Safari(isPackaged);
     }
 
     return Safari.#instance;
@@ -70,10 +66,13 @@ export class Safari {
   /* ------------------------------------------------------------------- #getLatestJournal ---- */
 
   // https://stackoverflow.com/questions/15696218/get-the-most-recent-file-in-a-directory-node-js
-  #getLatestJournal(): Journal | undefined {
+  #getLatestJournal(): Journal|undefined {
     // @ts-ignore
-    const journals = globSync(this.#journalPattern, {windowsPathsNoEscape: true});
-    const journalPath: string | undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
+    const journals                      = globSync(
+        this.#journalPattern,
+        { windowsPathsNoEscape: true },
+    );
+    const journalPath: string|undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
 
     if (journalPath) {
       Log.write(`New journal file found, now watching ${path.basename(journalPath)}.`);
@@ -87,7 +86,7 @@ export class Safari {
   /* --------------------------------------------------------------------- watchJournalDir ---- */
 
   watchJournalDir(): void {
-    const options = {usePolling: true, persistent: true, ignoreInitial: true};
+    const options = { usePolling: true, persistent: true, ignoreInitial: true };
     // @ts-ignore
     this.#watcher = chokidar.watch(this.#journalPattern, options);
 

@@ -1,25 +1,17 @@
+import type { SAAScanComplete, Scan } from '@kayahr/ed-journal';
 import type { valuableBody } from '../@types/edsmResponses';
-import type {
-  asteroidScan,
-  autoScan,
-  detailedScan,
-  planetScan,
-  starScan,
-} from '../@types/journalLines';
 
 import { BodyCodes } from '../data/BodyCodes';
 
-export interface Body extends starScan<'AutoScan'|'DetailedScan'>,
-    asteroidScan<'AutoScan'|'DetailedScan'>,
-    planetScan<'AutoScan'|'DetailedScan'> {}
+export interface Body extends Scan {}
 
 export class Body {
   DSSDone: boolean;
   mappedValue: number;
 
   constructor(
-      journalLine: autoScan|detailedScan|valuableBody|null = null,
-      DSS: boolean                                         = false,
+      journalLine: Scan|SAAScanComplete|valuableBody|null = null,
+      DSS: boolean                                        = false,
   ) {
     this.DSSDone = DSS;
 
@@ -67,7 +59,15 @@ export class Body {
   /* ---------------------------------------------------------------------------- simpleName ---- */
 
   simpleName(): string {
-    return this.BodyName.replace(this.StarSystem, '');
+    let name: string;
+
+    if (typeof this.StarSystem === 'string') {
+      name = this.BodyName.replace(this.StarSystem, '');
+    } else {
+      name = this.BodyName;
+    }
+
+    return name;
   }
 
   /* ------------------------------------------------------------------------------ typeIcon ---- */
@@ -78,19 +78,19 @@ export class Body {
     if (this.isStar() || this.isAsteroid()) {
       typeIcon = this.nameIcon();
     } else {
-      const planetClass: string = this.PlanetClass.toLowerCase();
+      const planetClass: string|undefined = this.PlanetClass?.toLowerCase();
 
-      if (planetClass.includes('metal')) {
+      if (planetClass?.includes('metal')) {
         typeIcon = 'ingot';
-      } else if (planetClass.includes('icy')) {
+      } else if (planetClass?.includes('icy')) {
         typeIcon = 'snowflake';
-      } else if (planetClass.includes('earth')) {
+      } else if (planetClass?.includes('earth')) {
         typeIcon = 'earth';
-      } else if (planetClass.includes('gas giant')) {
+      } else if (planetClass?.includes('gas giant')) {
         typeIcon = 'jupiter-1';
-      } else if (planetClass.includes('rock')) {
+      } else if (planetClass?.includes('rock')) {
         typeIcon = 'asteroid-3';
-      } else if (planetClass.includes('water') || planetClass.includes('ammonia')) {
+      } else if (planetClass?.includes('water') || planetClass?.includes('ammonia')) {
         typeIcon = 'water-drops';
       }
     }
@@ -105,7 +105,7 @@ export class Body {
 
   #getValue(): number {
     const bodyType = this.#getNumericalBodyType();
-    const mass     = 'MassEM' in this ? this.MassEM : 1;
+    const mass     = this.MassEM !== undefined ? this.MassEM : 1;
 
     let terraformState = this.#getNumericalTerraformState();
 
