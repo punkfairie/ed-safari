@@ -19,24 +19,20 @@ interface settingsFile {
 }
 
 export class Settings extends EventEmitter {
-  static #instance: Settings|undefined;
+  static #instance: Settings | undefined;
 
   readonly #file: string;
 
   minValue: number;
   maxDistance: number;
 
-  #matrixFile: null|string;
+  #matrixFile: null | string;
   matrix?: EliteMatrix;
 
   private constructor(isPackaged: boolean) {
     super();
 
-    if (!isPackaged && os.platform() === 'linux') {
-      this.#file = '/mnt/c/Users/marle/ed-safari-settings.json';
-    } else {
-      this.#file = path.join(os.homedir(), 'ed-safari-settings.json');
-    }
+    this.#file = path.join(os.homedir(), 'ed-safari-settings.json');
 
     // Check if settings file exists, and create it if not. Using sync since it's such a small
     // file, and this information is necessary to build the UI.
