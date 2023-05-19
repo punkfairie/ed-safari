@@ -1,5 +1,5 @@
 { "timestamp":"2023-05-10T00:32:42Z", "event":"NavRoute", "Route":[
-  { "StarSystem":"LHS 20", "SystemAddress":33656303199641, "StarPos":[11.18750,-37.37500,-31.84375], "StarClass":"M" },
+  { "StarSystem":"Kremainn", "SystemAddress":13864557094337, "StarPos":[-37.06250,-11.15625,59.06250], "StarClass":"M" },
   { "StarSystem":"Jastreb Sector SO-R a4-1", "SystemAddress":22954989472560, "StarPos":[-42.93750,-33.37500,-41.09375], "StarClass":"T" },
   { "StarSystem":"LHS 1393", "SystemAddress":7267487262097, "StarPos":[-39.87500,-27.09375,-51.40625], "StarClass":"M" }
 ] }

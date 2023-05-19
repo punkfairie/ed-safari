@@ -1,6 +1,7 @@
-import {expect, jest} from '@jest/globals';
-import {EliteMatrix} from 'elite-matrix';
-import {Settings} from '../src/models/Settings';
+import { expect, jest } from '@jest/globals';
+import { EliteMatrix } from 'elite-matrix';
+import { Settings } from '../src/models/Settings';
+import { mockSettings } from './mockData';
 
 jest.mock('fs');
 
@@ -13,6 +14,11 @@ describe('Settings', () => {
 
   beforeEach(() => {
     require('fs').__setFileContents(JSON.stringify(settingsFile));
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+    Settings.destroy();
   });
 
   describe('get()', () => {
@@ -36,7 +42,7 @@ describe('Settings', () => {
 
   describe('save()', () => {
     const writeFileMock = jest.spyOn(require('fs/promises'), 'writeFile');
-    const readFileMock = jest.spyOn(require('fs/promises'), 'readFile');
+    const readFileMock  = jest.spyOn(require('fs/promises'), 'readFile');
 
     it('should return boolean', async () => {
       writeFileMock.mockResolvedValue(undefined);
@@ -73,7 +79,7 @@ describe('Settings', () => {
         matrixFile:  'GraphicsConfiguration.xml',
       };
       require('fs').__setFileContents(JSON.stringify(settingsFile));
-      const matrixFile = '<GraphicsConfig><GUIColour><Default><MatrixRed>1,0,0</MatrixRed><MatrixGreen>0,1,0</MatrixGreen><MatrixBlue>0,0,1</MatrixBlue></Default></GUIColour></GraphicsConfig>';
+      const matrixFile = mockSettings.graphicsConfigXml;
       readFileMock.mockResolvedValue(matrixFile);
 
       const settings = Settings.get();
@@ -84,10 +90,5 @@ describe('Settings', () => {
         done();
       });
     });
-  });
-
-  afterEach(() => {
-    jest.resetAllMocks();
-    Settings.destroy();
   });
 });

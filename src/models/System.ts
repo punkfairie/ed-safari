@@ -5,7 +5,7 @@ import * as _ from 'lodash-es';
 import { Body } from './Body';
 import { EDSM } from './EDSM';
 
-type ExtendedNavRouteSystem = (ExtendedNavRoute)['Route'][0];
+export type ExtendedNavRouteSystem = (ExtendedNavRoute)['Route'][0];
 
 export class System {
   name: string;
@@ -19,7 +19,7 @@ export class System {
   estimatedValueMapped?: number;
   valuableBodies?: Body[];
 
-  constructor(line?: ExtendedNavRouteSystem|FSDJump|Location) {
+  constructor(line?: ExtendedNavRouteSystem | FSDJump | Location) {
     if (!line) {
       this.name = 'Unknown';
     } else {

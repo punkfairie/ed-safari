@@ -6,12 +6,12 @@ const os           = require('os');
 const path         = require('path');
 
 export class Safari extends EventEmitter {
-  static #instance: Safari;
+  static #instance?: Safari;
   readonly #journalDir?: string;
   readonly #journalPattern?: string;
   CMDR?: CMDR;
 
-  private constructor(isPackaged: boolean = false) {
+  private constructor(isPackaged: boolean = true) {
     super();
 
     this.#journalDir = this.#getJournalDir(isPackaged);
@@ -26,7 +26,7 @@ export class Safari extends EventEmitter {
 
   /* --------------------------------------------------------------------------------- start ---- */
 
-  static start(isPackaged: boolean = false): Safari {
+  static start(isPackaged: boolean = true): Safari {
     if (!Safari.#instance) {
       Safari.#instance = new Safari(isPackaged);
     }
@@ -78,5 +78,6 @@ export class Safari extends EventEmitter {
 
   shutdown(): void {
     this.CMDR?.shutdown();
+    Safari.#instance = undefined;
   }
 }

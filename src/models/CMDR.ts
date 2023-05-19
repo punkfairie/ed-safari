@@ -1,4 +1,4 @@
-import { FSDJump, Journal, JournalEvent, Scan } from '@kayahr/ed-journal';
+import { FSDJump, Journal, JournalEvent, JournalOptions, Scan } from '@kayahr/ed-journal';
 import * as _ from 'lodash-es';
 import { Body } from './Body';
 import { Log } from './Log';
@@ -13,15 +13,29 @@ const reverseLineReader = require('reverse-line-reader');
 export class CMDR extends EventEmitter {
   location: System;
   #journal?: Journal;
+  readonly #journalOptions: JournalOptions;
   navRoute: System[];
 
-  constructor(journalPattern: string) {
+
+  constructor(journalFolder: string) {
     super();
 
     this.location = new System();
     this.navRoute = [];
 
-    const latestJournal: string|undefined = this.#getLatestJournal(journalPattern);
+    let journalPattern = journalFolder;
+    if (!journalPattern.includes('Journal.*.log')) {
+      journalPattern = path.join(journalPattern, 'Journal.*.log');
+    }
+
+    if (journalPattern.includes('test_journals')) {
+      this.#journalOptions =
+          { directory: path.dirname(journalPattern), position: 'end', watch: true };
+    } else {
+      this.#journalOptions = { position: 'end', watch: true };
+    }
+
+    const latestJournal: string | undefined = this.#getLatestJournal(journalPattern);
 
     if (latestJournal) {
       Log.write(`Attempting to find current location.`);
@@ -37,10 +51,9 @@ export class CMDR extends EventEmitter {
               Log.write('No scanned bodies found in current system.');
             }
 
-            this.#journal = await Journal.open({ position: 'end' });
+            this.#journal = await Journal.open(this.#journalOptions);
             Log.write('Checking for nav route.');
             await this.#setNavRoute();
-            await this.#journal.close();
           });
         }
       });
@@ -49,10 +62,10 @@ export class CMDR extends EventEmitter {
 
   /* --------------------------------------------------------------------- #getLatestJournal ---- */
 
-  #getLatestJournal(journalPattern: string): string|undefined {
+  #getLatestJournal(journalPattern: string): string | undefined {
     const journals = globSync(journalPattern, { windowsPathsNoEscape: true });
 
-    const journalPath: string|undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
+    const journalPath: string | undefined = _.maxBy(journals, file => fs.statSync(file).mtime);
 
     if (journalPath) {
       Log.write(`New journal file found, now watching ${path.basename(journalPath)}.`);
@@ -86,7 +99,7 @@ export class CMDR extends EventEmitter {
   /* --------------------------------------------------------------------- #getScannedBodies ---- */
 
   #getScannedBodies(latestJournal: string): any {
-    let dssLine: Scan|null = null;
+    let dssLine: Scan | null = null;
 
     return reverseLineReader.eachLine(latestJournal, (raw: string) => {
       if (raw) {
@@ -168,42 +181,43 @@ export class CMDR extends EventEmitter {
   /* --------------------------------------------------------------------------------- track ---- */
 
   async track() {
-    this.#journal = await Journal.open({ watch: true, position: 'end' });
-
     let dssFlag: boolean = false;
-    for await (const event of this.#journal) {
-      switch (event.event) {
-        case 'StartJump': {
-          if (event.JumpType === 'Hyperspace') this.emit('ENTERING_WITCH_SPACE');
-          break;
-        }
 
-        case 'FSDJump': {
-          this.#hasJumped(event);
-          break;
-        }
+    if (this.#journal) {
+      for await (const event of this.#journal) {
+        switch (event.event) {
+          case 'StartJump': {
+            if (event.JumpType === 'Hyperspace') this.emit('ENTERING_WITCH_SPACE');
+            break;
+          }
 
-        case 'SAAScanComplete': {
-          dssFlag = true;
-          break;
-        }
+          case 'FSDJump': {
+            this.#hasJumped(event);
+            break;
+          }
 
-        case 'Scan': {
-          this.#hasScanned(event, dssFlag);
-          dssFlag = false;
-          break;
-        }
+          case 'SAAScanComplete': {
+            dssFlag = true;
+            break;
+          }
 
-        case 'NavRoute': {
-          await this.#setNavRoute();
-          break;
-        }
+          case 'Scan': {
+            this.#hasScanned(event, dssFlag);
+            dssFlag = false;
+            break;
+          }
 
-        case 'NavRouteClear': {
-          this.navRoute = [];
-          Log.write('Nav route cleared.');
-          this.emit('SET_NAV_ROUTE');
-          break;
+          case 'NavRoute': {
+            await this.#setNavRoute();
+            break;
+          }
+
+          case 'NavRouteClear': {
+            this.navRoute = [];
+            Log.write('Nav route cleared.');
+            this.emit('SET_NAV_ROUTE');
+            break;
+          }
         }
       }
     }
@@ -225,8 +239,8 @@ export class CMDR extends EventEmitter {
   /* --------------------------------------------------------------------------- #hasScanned ---- */
 
   #hasScanned(event: Scan, isDss: boolean) {
-    const dupChecker    = { 'BodyName': event.BodyName, 'BodyID': event.BodyID };
-    let body: Body|null = null;
+    const dupChecker      = { 'BodyName': event.BodyName, 'BodyID': event.BodyID };
+    let body: Body | null = null;
 
     if (isDss) {
       const bodyIndex = _.findIndex(this.location.bodies, dupChecker);
