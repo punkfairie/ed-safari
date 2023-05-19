@@ -10,8 +10,8 @@ export class Body {
   mappedValue: number;
 
   constructor(
-      journalLine: Scan|SAAScanComplete|valuableBody|null = null,
-      DSS: boolean                                        = false,
+      journalLine: Scan | SAAScanComplete | valuableBody | null = null,
+      DSS: boolean                                              = false,
   ) {
     this.DSSDone = DSS;
 
@@ -59,13 +59,11 @@ export class Body {
   /* ---------------------------------------------------------------------------- simpleName ---- */
 
   simpleName(): string {
-    let name: string;
+    let name: string = this.BodyName;
 
-    if (typeof this.StarSystem === 'string') {
-      name = this.BodyName.replace(this.StarSystem, '');
-    } else {
-      name = this.BodyName;
-    }
+    if (typeof this.StarSystem === 'string') name = this.BodyName.replace(this.StarSystem, '');
+
+    if (name === '') name = 'Star';
 
     return name;
   }
@@ -78,7 +76,7 @@ export class Body {
     if (this.isStar() || this.isAsteroid()) {
       typeIcon = this.nameIcon();
     } else {
-      const planetClass: string|undefined = this.PlanetClass?.toLowerCase();
+      const planetClass: string | undefined = this.PlanetClass?.toLowerCase();
 
       if (planetClass?.includes('metal')) {
         typeIcon = 'ingot';
@@ -122,8 +120,8 @@ export class Body {
 
   /* ----------------------------------------------------------------- #getNumericalBodyType ---- */
 
-  #getNumericalBodyType(): number|undefined {
-    let code: number|undefined;
+  #getNumericalBodyType(): number | undefined {
+    let code: number | undefined;
 
     if (this.isStar()) {
       // Typescript feels so stupid sometimes.
@@ -137,8 +135,8 @@ export class Body {
 
   /* ----------------------------------------------------------- #getNumericalTerraformState ---- */
 
-  #getNumericalTerraformState(): number|undefined {
-    let terraformState: number|undefined;
+  #getNumericalTerraformState(): number | undefined {
+    let terraformState: number | undefined;
 
     if ('TerraformState' in this) {
       terraformState =
@@ -149,7 +147,7 @@ export class Body {
 
   /* ------------------------------------------------------------------------- #appraiseStar ---- */
 
-  #appraiseStar(bodyType: number|undefined, mass: number): number {
+  #appraiseStar(bodyType: number | undefined, mass: number): number {
     let value: number = 1200;
 
     if (bodyType) {
@@ -173,9 +171,9 @@ export class Body {
   /* ----------------------------------------------------------------------- #appraisePlanet ---- */
 
   #appraisePlanet(
-      bodyType: number|undefined,
+      bodyType: number | undefined,
       mass: number,
-      terraformState: number|undefined,
+      terraformState: number | undefined,
   ): number {
     let value: number          = this.#calculatePlanetBaseValue(bodyType);
     let terraformBonus: number = this.#calculateTerraformBonus(bodyType, terraformState);
@@ -197,7 +195,7 @@ export class Body {
 
   /* ------------------------------------------------------------- #calculatePlanetBaseValue ---- */
 
-  #calculatePlanetBaseValue(bodyType: number|undefined): number {
+  #calculatePlanetBaseValue(bodyType: number | undefined): number {
     let value: number = 300;
 
     if (bodyType) {
@@ -222,7 +220,10 @@ export class Body {
 
   /* -------------------------------------------------------------- #calculateTerraformBonus ---- */
 
-  #calculateTerraformBonus(bodyType: number|undefined, terraformState: number|undefined): number {
+  #calculateTerraformBonus(
+      bodyType: number | undefined,
+      terraformState: number | undefined,
+  ): number {
     let bonus: number = 0;
 
     if (terraformState && terraformState > 0) {
