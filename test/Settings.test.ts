@@ -72,15 +72,17 @@ describe('Settings', () => {
   describe('#setMatrix()', () => {
     const readFileMock = jest.spyOn(require('fs/promises'), 'readFile');
 
-    it('should set matrix from GraphicsConfiguration.xml', (done) => {
+    it.each([
+      { file: 'GraphicsConfiguration.xml', contents: mockSettings.graphicsConfigXml },
+      { file: 'XML-Profile.ini', contents: mockSettings.xmlProfileIni },
+    ])('should set matrix from $file', ({ file, contents }, done) => {
       const settingsFile = {
         minValue:    500000,
         maxDistance: 10000,
-        matrixFile:  'GraphicsConfiguration.xml',
+        matrixFile:  file,
       };
       require('fs').__setFileContents(JSON.stringify(settingsFile));
-      const matrixFile = mockSettings.graphicsConfigXml;
-      readFileMock.mockResolvedValue(matrixFile);
+      readFileMock.mockResolvedValue(contents);
 
       const settings = Settings.get();
 

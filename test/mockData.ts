@@ -188,4 +188,5 @@ export const mockEdsmResponses = {
 
 export const mockSettings = {
   graphicsConfigXml: '<GraphicsConfig><GUIColour><Default><MatrixRed>1,0,0</MatrixRed><MatrixGreen>0,1,0</MatrixGreen><MatrixBlue>0,0,1</MatrixBlue></Default></GUIColour></GraphicsConfig>',
+  xmlProfileIni:     '[constants]\nx150 = 1\ny150 = 0\nz150 = 0\nx151 = 0\ny151 = 1\nz151 = 0\nx152 = 0\ny152 = 0\nz152 = 1\n',
 };
