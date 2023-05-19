@@ -1,11 +1,10 @@
 // noinspection DuplicatedCode
 
 import { expect, jest, it, beforeEach } from '@jest/globals';
-import { ExtendedNavRoute, FSDJump, Location } from '@kayahr/ed-journal';
+import { FSDJump, Location } from '@kayahr/ed-journal';
 import { Body } from '../src/models/Body';
 import { CMDR } from '../src/models/CMDR';
 import { EDSM } from '../src/models/EDSM';
-import { Journal } from '../src/models/Journal';
 import { ExtendedNavRouteSystem, System } from '../src/models/System';
 import { mockEdsmResponses, mockObjects } from './mockData';
 

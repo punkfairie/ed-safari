@@ -29,7 +29,7 @@ export class Settings extends EventEmitter {
   #matrixFile: null | string;
   matrix?: EliteMatrix;
 
-  private constructor(isPackaged: boolean) {
+  private constructor() {
     super();
 
     this.#file = path.join(os.homedir(), 'ed-safari-settings.json');
@@ -61,9 +61,9 @@ export class Settings extends EventEmitter {
     }
   }
 
-  static get(isPackaged: boolean = false): Settings {
+  static get(): Settings {
     if (!Settings.#instance) {
-      Settings.#instance = new Settings(isPackaged);
+      Settings.#instance = new Settings();
     }
 
     return Settings.#instance;

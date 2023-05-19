@@ -4,7 +4,6 @@ import { Settings } from '../src/models/Settings';
 import { mockSettings } from './mockData';
 
 jest.mock('fs');
-const fs = require('fs');
 
 describe('Settings', () => {
   const settingsFile = {
